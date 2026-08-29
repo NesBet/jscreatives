@@ -20,7 +20,7 @@ A full-stack e-commerce platform for custom football merchandise (jerseys, poste
 2. **Verify OTP** (`/api/auth/verify-otp`)
    - n8n verifies the code. On success the app creates (signup) or logs in (login) the user and issues a session cookie.
 3. **Session** (`src/lib/session.ts`)
-   - A `jose` JWT in an HTTP-only, Secure, SameSite cookie. **Expires after 30 minutes of inactivity**; `src/middleware.ts` refreshes it on authenticated navigation.
+   - A `jose` JWT in an HTTP-only, Secure, SameSite cookie. **Expires after 30 minutes of inactivity**; `src/proxy.ts` (Next.js 16 proxy) refreshes it on authenticated navigation.
 4. **Brute-force protection**
    - 4 OTP attempts per number, then a **10-minute lock** (`lockedUntil`), enforced **server-side per phone number** inside n8n (`jscreatives_verifications` table). The app surfaces `locked` / `lockedUntil` so the UI shows a live countdown that survives refresh / new tab.
 
@@ -107,12 +107,12 @@ Sign in by entering the phone number and the WhatsApp OTP (delivered via the con
 
 - Passwords / placeholders hashed with `bcryptjs` (12 rounds).
 - JWT (`jose`) in HTTP-only, Secure, SameSite=Lax cookies.
-- **30-minute inactivity session** expiry, refreshed by middleware.
+- **30-minute inactivity session** expiry, refreshed by the proxy (`src/proxy.ts`).
 - Rate limiting on auth endpoints: login OTP `5/min`, signup OTP `3/15min`, verify OTP `10/10min`.
 - **Server-enforced OTP lockout**: 4 attempts → 10-minute lock per phone number (n8n `jscreatives_verifications`).
 - `N8N_CONTACT_SECRET` header authentication on every n8n webhook call.
 - Server-side input validation with Zod.
-- Role-based access control (RBAC: ADMIN / CUSTOMER) enforced in API routes and middleware.
+- Role-based access control (RBAC: ADMIN / CUSTOMER) enforced in API routes and the proxy (`src/proxy.ts`).
 - Paystack webhook signature verification.
 - Security headers (CSP, X-Frame-Options, HSTS, etc.).
 - Parameterized queries via Prisma (no raw SQL injection).
@@ -162,11 +162,10 @@ src/
 │   └── utils.ts               # General utilities
 ├── constants/
 │   └── countries.ts           # EAST_AFRICA_COUNTRIES (KE/TZ/UG) + buildE164
-└── middleware.ts              # 30-min inactivity enforcement + route/role protection
+└── proxy.ts                   # 30-min inactivity enforcement + route/role protection (Next.js 16 proxy convention)
 prisma/
 ├── schema.prisma              # Database schema
 └── seed.ts                    # Database seeder (admin, Nesh, 39 products)
-proxy.ts                       # Next.js 16 proxy config
 ```
 
 ## API Endpoints
