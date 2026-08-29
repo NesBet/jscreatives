@@ -85,13 +85,6 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000).
 
-## Default Accounts (phone-based, WhatsApp OTP)
-
-| Role | Phone | Email |
-|------|-------|-------|
-| Admin | +254780237794 | admin@jscreatives.com |
-| Customer | +254794249775 | nesh.rono69@gmail.com |
-
 Sign in by entering the phone number and the WhatsApp OTP (delivered via the configured n8n flow).
 
 ## Features
