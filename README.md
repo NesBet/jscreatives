@@ -97,7 +97,7 @@ Sign in by entering the phone number and the WhatsApp OTP (delivered via the con
 - WhatsApp-number OTP sign-in / sign-up with 10-minute lockout after 4 failed attempts.
 
 ### Admin
-- Dashboard with sales metrics.
+- Dashboard with sales metrics for admin.
 - Product CRUD management.
 - Order management with status updates.
 - User management.
