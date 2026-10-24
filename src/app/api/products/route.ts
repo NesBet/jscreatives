@@ -4,8 +4,8 @@ import { PRODUCT_PER_PAGE } from '@/constants'
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const club = searchParams.get('club')
-    const kitType = searchParams.get('kitType')
+    const category = searchParams.get('category')
+    const printMethod = searchParams.get('printMethod')
     const search = searchParams.get('search')
     const sort = searchParams.get('sort')
     const page = parseInt(searchParams.get('page') || '1')
@@ -17,13 +17,14 @@ export async function GET(request: Request) {
 
     const where: Record<string, unknown> = { active: true }
 
-    if (club) where.club = club
-    if (kitType) where.kitType = kitType
+    if (category) where.category = category
+    if (printMethod) where.printMethod = printMethod
     if (featured === 'true') where.featured = true
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { club: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { material: { contains: search, mode: 'insensitive' } },
       ]
     }
 

@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
-import { PRINTING_SURCHARGE } from '@/constants'
 
 export async function PATCH(
   request: Request,
@@ -16,13 +15,12 @@ export async function PATCH(
     const body = await request.json()
 
     const hasQuantity = typeof body.quantity === 'number'
-    const hasPrinting = typeof body.printingEnabled === 'boolean'
 
-    if (!hasQuantity && !hasPrinting) {
-      return Response.json({ error: 'Provide quantity or printingEnabled' }, { status: 400 })
+    if (!hasQuantity) {
+      return Response.json({ error: 'Provide a quantity' }, { status: 400 })
     }
 
-    if (hasQuantity && (body.quantity < 1)) {
+    if (body.quantity < 1) {
       return Response.json({ error: 'Quantity must be at least 1' }, { status: 400 })
     }
 
@@ -35,26 +33,9 @@ export async function PATCH(
       return Response.json({ error: 'Cart item not found' }, { status: 404 })
     }
 
-    const updateData: Record<string, unknown> = {}
-
-    if (hasQuantity) {
-      updateData.quantity = body.quantity
-    }
-
-    if (hasPrinting) {
-      updateData.printingEnabled = body.printingEnabled
-      updateData.printingName = body.printingName || null
-      updateData.printingNumber = body.printingNumber || null
-
-      const basePrice = cartItem.variant.priceOverride
-        ? parseFloat(cartItem.variant.priceOverride.toString())
-        : parseFloat(cartItem.variant.product.basePrice.toString())
-      updateData.unitPrice = body.printingEnabled ? basePrice + PRINTING_SURCHARGE : basePrice
-    }
-
     const updated = await prisma.cartItem.update({
       where: { id: itemId },
-      data: updateData,
+      data: { quantity: body.quantity },
     })
 
     return Response.json({ cartItem: updated }, { status: 200 })

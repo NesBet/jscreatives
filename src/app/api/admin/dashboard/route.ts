@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         prisma.user.count(),
         prisma.productVariant.findMany({
           where: { stock: { lt: 5 } },
-          include: { product: { select: { name: true, club: true } } },
+          include: { product: { select: { name: true, category: true } } },
           orderBy: { stock: 'asc' },
         }),
         prisma.order.findMany({
@@ -31,8 +31,8 @@ export async function GET(request: Request) {
         }),
       ])
 
-    const topSellingClubs = await prisma.orderItem.groupBy({
-      by: ['productClub'],
+    const topSellingCategories = await prisma.orderItem.groupBy({
+      by: ['productCategory'],
       _sum: { quantity: true },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 5,
@@ -44,8 +44,8 @@ export async function GET(request: Request) {
         totalOrders,
         totalUsers,
         lowStockAlerts: lowStockVariants,
-        topSellingClubs: topSellingClubs.map((c) => ({
-          club: c.productClub,
+        topSellingCategories: topSellingCategories.map((c) => ({
+          category: c.productCategory,
           totalSold: c._sum.quantity,
         })),
         recentOrders,

@@ -7,39 +7,44 @@ import { cn } from "@/lib/utils";
 
 const faqs = [
   {
-    question: "How do I order a jersey with custom name & number?",
+    question: "How do I start a branding or print project?",
     answer:
-      "Add your favourite jersey to the cart, enable custom printing, and enter the name and number you'd like. Our team heat-presses it professionally before shipping.",
+      "Send us a brief through the Contact page with what you are launching, the pieces you need, quantities and your deadline. We reply with a scope, production route and quote.",
   },
   {
-    question: "Which clubs and kits do you stock?",
+    question: "Do you design as well as print?",
     answer:
-      "We carry home and away kits from top clubs including Manchester United, Arsenal, Chelsea, Manchester City, Tottenham and Liverpool, with more added regularly.",
+      "Yes. We handle identity design, artwork development and production. You can come with a finished logo or start from a blank page — either way we will prepare print-ready files.",
   },
   {
-    question: "What are your delivery times within Kenya?",
+    question: "What can you brand?",
     answer:
-      "Most orders are delivered within 2-5 business days. You'll receive tracking details once your order ships.",
+      "Apparel, caps, totes, backpacks, drinkware, notebooks, business cards, letterheads, stickers, banners and custom packaging. If it can be printed or embroidered, ask us.",
+  },
+  {
+    question: "Can I order small quantities?",
+    answer:
+      "Stock merchandise can be ordered in small quantities through the shop. Custom production runs have minimum order quantities that depend on the item and print method — we will confirm them in your quote.",
+  },
+  {
+    question: "What is your turnaround time?",
+    answer:
+      "In-stock branded merchandise usually ships within 2-5 business days. Custom identity and production projects typically take 2-3 weeks after artwork approval, depending on quantity and finishing.",
+  },
+  {
+    question: "Will I see a proof before production?",
+    answer:
+      "Always. We send a digital proof showing placement, colour and sizing. Production only begins after you approve it in writing.",
   },
   {
     question: "How does payment work?",
     answer:
-      "We use Paystack for secure checkout. You can pay with mobile money or card, and your order is processed only after payment is confirmed.",
+      "Shop orders are paid securely through Paystack by card or mobile money. Larger projects are invoiced with a deposit before production and the balance before delivery.",
   },
   {
-    question: "Can I return or exchange a jersey?",
+    question: "Can I return branded or printed items?",
     answer:
-      "Yes. Unworn jerseys in original condition can be returned within 7 days of delivery. Custom-printed items are non-returnable unless defective. See our Returns page for details.",
-  },
-  {
-    question: "Are the jerseys authentic?",
-    answer:
-      "We source premium, authentic-quality kits that match official standards for materials, stitching and comfort.",
-  },
-  {
-    question: "How do I contact support?",
-    answer:
-      "Use our Contact page to send a message, or reach us through the support links in the footer. We typically respond within one business day.",
+      "Custom-made and personalised items are non-returnable unless they are defective or differ from the approved proof. Unused stock items can be returned within 7 days. See our Returns page for details.",
   },
 ];
 
@@ -96,7 +101,7 @@ export default function FaqPage() {
             Frequently Asked <span className="gradient-text">Questions</span>
           </h1>
           <p className="mt-6 text-slate-400">
-            Everything you need to know about ordering, printing, shipping and returns.
+            Everything you need to know about projects, production, delivery and returns.
           </p>
         </header>
 
@@ -110,7 +115,7 @@ export default function FaqPage() {
           <h2 className="text-2xl font-semibold text-white font-[var(--font-display)]">
             Still have a question?
           </h2>
-          <p className="text-slate-400">Our team is happy to help you out.</p>
+          <p className="text-slate-400">Tell us what you are working on and we will point you in the right direction.</p>
           <MagneticButton href="/contact">Contact Us</MagneticButton>
         </div>
 

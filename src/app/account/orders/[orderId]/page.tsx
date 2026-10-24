@@ -10,15 +10,12 @@ import { formatPrice } from "@/lib/utils";
 interface OrderItem {
   id: string;
   productName: string;
-  productClub: string;
-  productKitType: string;
-  productSize: string;
+  productCategory: string;
+  productMethod: string;
+  productOption: string;
   productImage: string | null;
   quantity: number;
   unitPrice: number;
-  printingEnabled: boolean;
-  printingName: string | null;
-  printingNumber: string | null;
   subtotal: number;
 }
 
@@ -31,6 +28,7 @@ interface Order {
   shippingCity: string;
   shippingState: string;
   shippingPhone: string;
+  notes: string | null;
   items: OrderItem[];
   payment: {
     status: string;
@@ -116,7 +114,7 @@ export default function OrderDetailPage() {
       </div>
 
       <p className="mt-2 text-sm text-slate-400">
-        Placed on {new Date(order.createdAt).toLocaleDateString("en-NG", { dateStyle: "long" })}
+        Placed on {new Date(order.createdAt).toLocaleDateString("en-KE", { dateStyle: "long" })}
       </p>
 
       {order.payment?.status !== "SUCCESS" && order.payment?.reference && (
@@ -148,7 +146,7 @@ export default function OrderDetailPage() {
               <div>
                 <p className="text-slate-500">Paid At</p>
                 <p className="text-slate-300">
-                  {new Date(order.payment.paidAt).toLocaleDateString("en-NG")}
+                  {new Date(order.payment.paidAt).toLocaleDateString("en-KE")}
                 </p>
               </div>
             )}
@@ -167,6 +165,12 @@ export default function OrderDetailPage() {
           {order.shippingStreet}, {order.shippingCity}, {order.shippingState}
         </p>
         <p className="text-sm text-slate-400">Phone: {order.shippingPhone}</p>
+        {order.notes && (
+          <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Artwork &amp; branding notes</p>
+            <p className="mt-1 whitespace-pre-wrap text-xs text-slate-300">{order.notes}</p>
+          </div>
+        )}
       </div>
 
       {/* Items */}
@@ -180,16 +184,11 @@ export default function OrderDetailPage() {
             >
               <div>
                 <p className="text-sm font-medium text-white">
-                  {item.productClub} {item.productKitType}
+                  {item.productName}
                 </p>
                 <p className="text-xs text-slate-400">
-                  Size: {item.productSize} &middot; Qty: {item.quantity}
+                  {item.productCategory} &middot; {item.productMethod} &middot; {item.productOption} &middot; Qty: {item.quantity}
                 </p>
-                {item.printingEnabled && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    Printing: {item.printingName || "N/A"} #{item.printingNumber || "N/A"}
-                  </p>
-                )}
               </div>
               <p className="text-sm font-bold text-white">
                 {formatPrice(Number(item.subtotal))}

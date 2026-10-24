@@ -7,9 +7,10 @@ import { useCart } from "@/components/layout/cart-provider";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 
 const navLinks = [
-  { href: "/", label: "Home" },
   { href: "/catalog", label: "Shop" },
-  { href: "/account", label: "My Account" },
+  { href: "/#work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 interface MenuItemProps {

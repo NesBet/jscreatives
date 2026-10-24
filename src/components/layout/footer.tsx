@@ -2,7 +2,9 @@ import Link from "next/link";
 
 const footerLinks = [
   { href: "/catalog", label: "Shop" },
+  { href: "/#work", label: "Selected Work" },
   { href: "/about", label: "About" },
+  { href: "/contact", label: "Start a Project" },
 ];
 
 const socialLinks = [
@@ -24,8 +26,8 @@ export function Footer() {
               JS<span className="text-red-600">CREATIVES</span>
             </Link>
             <p className="mt-4 text-slate-400 max-w-md leading-relaxed">
-              Premium football jerseys with custom name & number printing.
-              Authentic quality, custom printing, and fast delivery across Kenya.
+              A Nairobi branding and print studio. Identity systems, branded apparel,
+              packaging, stationery and signage — designed and produced in-house.
             </p>
             <div className="mt-8 flex gap-4">
               {socialLinks.map((social) => (
@@ -76,7 +78,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} JSCREATIVES. All rights reserved.
           </p>
           <p className="text-sm text-slate-500">
-            Crafted with precision for football lovers everywhere.
+            Designed and produced in Nairobi, delivered across Kenya.
           </p>
         </div>
       </div>

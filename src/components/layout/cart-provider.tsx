@@ -2,22 +2,19 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/components/layout/auth-provider'
-import { PRINTING_SURCHARGE } from '@/constants'
 
 interface CartItem {
   id: string
   quantity: number
-  printingEnabled: boolean
-  printingName: string
-  printingNumber: string
   unitPrice: number | string
   variant: {
     id: string
-    size: string
+    option: string
     priceOverride: number | string | null
     product: {
-      club: string
-      kitType: string
+      name: string
+      category: string
+      printMethod: string
       slug: string
       basePrice: number | string
       images: { url: string; altText?: string }[]
@@ -30,8 +27,6 @@ interface CartContextValue {
   cartCount: number
   addItem: (variantId: string, quantity?: number) => Promise<void>
   updateQuantity: (itemId: string, quantity: number) => Promise<void>
-  togglePrinting: (itemId: string, enabled: boolean, name?: string, number?: string) => Promise<void>
-  updatePrinting: (itemId: string, name: string, number: string) => Promise<void>
   removeItem: (itemId: string) => Promise<void>
   clearCart: () => Promise<void>
   loading: boolean
@@ -111,48 +106,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const togglePrinting = useCallback(
-    async (itemId: string, enabled: boolean, name?: string, number?: string) => {
-      const prevItem = itemsRef.current.find((i) => i.id === itemId)
-      setItems((prev) =>
-        prev.map((i) => {
-          if (i.id !== itemId) return i
-          const base = Number(i.variant.product.basePrice)
-          const unitPrice = enabled ? base + PRINTING_SURCHARGE : base
-          return {
-            ...i,
-            printingEnabled: enabled,
-            printingName: name ?? '',
-            printingNumber: number ?? '',
-            unitPrice,
-          }
-        })
-      )
-      setUpdating((prev) => new Set(prev).add(itemId))
-      try {
-        const res = await fetch(`/api/cart/${itemId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            printingEnabled: enabled,
-            printingName: name,
-            printingNumber: number,
-          }),
-        })
-        if (!res.ok) throw new Error('Failed')
-      } catch {
-        if (prevItem) setItems((curr) => curr.map((i) => (i.id === itemId ? prevItem : i)))
-      } finally {
-        setUpdating((prev) => {
-          const next = new Set(prev)
-          next.delete(itemId)
-          return next
-        })
-      }
-    },
-    []
-  )
-
   const removeItem = useCallback(async (itemId: string) => {
     const idx = itemsRef.current.findIndex((i) => i.id === itemId)
     const prevItem = itemsRef.current[idx]
@@ -177,33 +130,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const updatePrinting = useCallback(
-    async (itemId: string, name: string, number: string) => {
-      const prevItem = itemsRef.current.find((i) => i.id === itemId)
-      setItems((prev) =>
-        prev.map((i) =>
-          i.id === itemId ? { ...i, printingName: name, printingNumber: number } : i
-        )
-      )
-      try {
-        const res = await fetch(`/api/cart/${itemId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            printingEnabled: prevItem?.printingEnabled ?? false,
-            printingName: name,
-            printingNumber: number,
-          }),
-        })
-        if (!res.ok) throw new Error("Failed")
-      } catch {
-        if (prevItem)
-          setItems((curr) => curr.map((i) => (i.id === itemId ? prevItem : i)))
-      }
-    },
-    []
-  )
-
   const clearCart = useCallback(async () => {
     const prev = itemsRef.current
     setItems([])
@@ -224,8 +150,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cartCount,
         addItem,
         updateQuantity,
-        togglePrinting,
-        updatePrinting,
         removeItem,
         clearCart,
         loading,

@@ -10,11 +10,10 @@ import { formatPrice } from "@/lib/utils";
 interface OrderItem {
   id: string;
   productName: string;
-  productClub: string;
-  productKitType: string;
-  productSize: string;
+  productCategory: string;
+  productMethod: string;
+  productOption: string;
   quantity: number;
-  printingEnabled: boolean;
   subtotal: number;
 }
 
@@ -112,7 +111,7 @@ export default function AccountPage() {
                       Order #{order.id.slice(0, 8)}...
                     </p>
                     <p className="text-xs text-slate-400">
-                      {new Date(order.createdAt).toLocaleDateString("en-NG")}{" "}
+                      {new Date(order.createdAt).toLocaleDateString("en-KE")}{" "}
                       &middot; {order.items.length} item
                       {order.items.length !== 1 ? "s" : ""}
                     </p>

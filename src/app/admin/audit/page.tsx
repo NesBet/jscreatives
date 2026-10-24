@@ -96,7 +96,7 @@ export default function AdminAuditPage() {
                       {log.details ? JSON.stringify(log.details) : "N/A"}
                     </td>
                     <td className="p-4 text-slate-400">
-                      {new Date(log.createdAt).toLocaleDateString("en-NG")}
+                      {new Date(log.createdAt).toLocaleDateString("en-KE")}
                     </td>
                   </tr>
                 ))

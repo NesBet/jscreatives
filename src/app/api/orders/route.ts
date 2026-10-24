@@ -45,30 +45,15 @@ export async function POST(request: Request) {
       return {
         variantId: item.variantId,
         productName: product.name,
-        productClub: product.club,
-        productKitType: product.kitType,
-        productSize: item.variant.size,
+        productCategory: product.category,
+        productMethod: product.printMethod,
+        productOption: item.variant.option,
         productImage: product.images[0]?.url || null,
         quantity: item.quantity,
         unitPrice,
-        printingEnabled: item.printingEnabled,
-        printingName: item.printingName,
-        printingNumber: item.printingNumber,
         subtotal,
       }
     })
-
-    // Require name & number when custom printing is selected
-    for (const item of orderItems) {
-      if (item.printingEnabled && (!item.printingName?.trim() || !item.printingNumber?.trim())) {
-        return Response.json(
-          {
-            error: `Please enter a name and number for the printed jersey: ${item.productClub} ${item.productKitType}`,
-          },
-          { status: 400 }
-        )
-      }
-    }
 
     const address = parsed.data
     const reference = `JS-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
@@ -86,6 +71,7 @@ export async function POST(request: Request) {
           shippingPostalCode: address.postalCode,
           shippingCountry: address.country,
           shippingPhone: address.phone,
+          notes: address.notes?.trim() || null,
           paymentReference: reference,
           items: { create: orderItems },
         },

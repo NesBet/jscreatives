@@ -1,6 +1,6 @@
-# JSCREATIVES — Premium Custom Jerseys, Posters, Banners & Cards
+# JSCREATIVES — Branding, Merchandise & Print Platform
 
-A full-stack e-commerce platform for custom football merchandise (jerseys, posters, banners, cards) with name & number printing, built with **Next.js 16 (App Router, TypeScript, Turbopack)**, **Prisma + PostgreSQL**, **Paystack** payments, and **n8n**-powered WhatsApp OTP authentication.
+A full-stack storefront and portfolio for a Nairobi branding and print studio. Customers can browse branded apparel, bags, drinkware, stationery, signage and packaging, while the homepage showcases identity and print work. Built with **Next.js 16 (App Router, TypeScript, Turbopack)**, **Prisma + PostgreSQL**, **Paystack** payments, and **n8n**-powered WhatsApp OTP authentication.
 
 ## Tech Stack
 
@@ -73,7 +73,7 @@ npm run seed
 This creates:
 - **Admin**: phone `+254780237794` (email `admin@jscreatives.com`, role `ADMIN`)
 - **Customer**: Nesh Rono, phone `+254794249775` (email `nesh.rono69@gmail.com`, role `CUSTOMER`)
-- **39 jersey products** (13 clubs × 3 kit types: HOME / AWAY / THIRD) with images and size variants (S–XXL)
+- **18 branded products** across 7 categories (apparel, headwear, bags, drinkware, stationery, signage, packaging) with images, print methods and option variants
 
 Seeded accounts use `ACCOUNT_DEFAULT_PASSWORD_HASH` as their password hash.
 
@@ -90,8 +90,10 @@ Sign in by entering the phone number and the WhatsApp OTP (delivered via the con
 ## Features
 
 ### Customer
-- Browse jerseys by club, kit type, price; per-page dropdown for results count.
-- Product detail pages with image carousel and custom name/number printing.
+- Homepage portfolio of selected branding and print work.
+- Browse merchandise by category and print method, sort by price or newest, with a per-page selector.
+- Product detail pages with image carousel, material, turnaround and option selection.
+- Add artwork and branding notes at checkout; the studio reviews them before production.
 - Shopping cart with persistent state.
 - Paystack checkout integration and order history/tracking.
 - WhatsApp-number OTP sign-in / sign-up with 10-minute lockout after 4 failed attempts.
@@ -165,7 +167,7 @@ src/
 └── proxy.ts                   # 30-min inactivity enforcement + route/role protection (Next.js 16 proxy convention)
 prisma/
 ├── schema.prisma              # Database schema
-└── seed.ts                    # Database seeder (admin, Nesh, 39 products)
+└── seed.ts                    # Database seeder (admin, customer, 18 products)
 ```
 
 ## API Endpoints
@@ -187,6 +189,7 @@ prisma/
 
 ## Notes
 
-- The hero "Premium Custom (Jerseys, Posters, Banners, Cards)" rotator is a JS-driven, accessibility-aware animation (respects `prefers-reduced-motion`).
-- Currency is displayed as `Ksh`.
+- The homepage hero uses `public/images/examples/hero-work-collage.jpg`; all product and portfolio imagery lives in `public/images/examples/`.
+- GSAP-driven reveals and the hero parallax respect `prefers-reduced-motion`.
+- Currency is displayed as `KES` using `en-KE` formatting.
 - Type safety is enforced with `tsc --noEmit`; lint with `eslint` (no explicit `any`). Both must pass for `next build`.

@@ -71,9 +71,9 @@ export async function PUT(
         await tx.productVariant.deleteMany({ where: { productId: id } })
         if (variants.length > 0) {
           await tx.productVariant.createMany({
-            data: variants.map((v: { size: string; sku: string; stock: number; priceOverride?: number }) => ({
+            data: variants.map((v: { option: string; sku: string; stock: number; priceOverride?: number }) => ({
               productId: id,
-              size: v.size,
+              option: v.option,
               sku: v.sku,
               stock: v.stock,
               priceOverride: v.priceOverride || null,

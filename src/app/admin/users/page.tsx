@@ -175,7 +175,7 @@ export default function AdminUsersPage() {
                         </span>
                       </td>
                       <td className="p-4 text-slate-400">
-                        {new Date(u.createdAt).toLocaleDateString("en-NG")}
+                        {new Date(u.createdAt).toLocaleDateString("en-KE")}
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">

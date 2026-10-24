@@ -5,14 +5,14 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 export const metadata = {
   title: "Returns & Exchanges - JSCREATIVES",
   description:
-    "Our return and exchange policy for JSCREATIVES jersey orders across Kenya.",
+    "Our return and exchange policy for JSCREATIVES merchandise and print orders across Kenya.",
 };
 
 const policy = [
   {
     title: "7-Day Window",
     description:
-      "Unworn jerseys in original condition can be returned or exchanged within 7 days of delivery.",
+      "Unused stock merchandise in original condition can be returned or exchanged within 7 days of delivery.",
   },
   {
     title: "Original Condition",
@@ -20,14 +20,14 @@ const policy = [
       "Items must be unworn, unwashed and with all tags attached. Proof of purchase is required.",
   },
   {
-    title: "Custom Prints",
+    title: "Custom Production",
     description:
-      "Jerseys with custom name & number printing are made to order and are non-returnable unless defective.",
+      "Personalised and made-to-order items — including printed apparel, packaging and signage — are non-returnable unless defective or different from the approved proof.",
   },
   {
     title: "Defective Items",
     description:
-      "If your order arrives damaged or faulty, contact us immediately for a free replacement or refund.",
+      "If your order arrives damaged or faulty, contact us immediately for a repair, replacement or refund.",
   },
 ];
 
@@ -52,7 +52,7 @@ export default function ReturnsPage() {
             Returns & <span className="gradient-text">Exchanges</span>
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            We want you to love your kit. If something isn&apos;t right, here&apos;s how our
+            We want you to love what we make. If something isn&apos;t right, here&apos;s how our
             return and exchange process works.
           </p>
         </header>

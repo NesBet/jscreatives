@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { PRODUCT_CATEGORIES, PRINT_METHODS } from '@/constants'
 
 // E.164 phone, e.g. +254780237794
 export const phoneSchema = z
@@ -40,16 +41,17 @@ export const productSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   slug: z.string().min(1, 'Slug is required'),
   description: z.string().default(''),
-  club: z.string().min(1, 'Club is required'),
-  kitType: z.enum(['HOME', 'AWAY', 'THIRD']),
-  season: z.string().min(1, 'Season is required'),
+  category: z.enum(PRODUCT_CATEGORIES),
+  printMethod: z.enum(PRINT_METHODS),
+  material: z.string().min(1, 'Material is required'),
+  turnaround: z.string().min(1, 'Turnaround is required'),
   basePrice: z.number().positive('Price must be positive'),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   variants: z
     .array(
       z.object({
-        size: z.string(),
+        option: z.string(),
         sku: z.string(),
         stock: z.number(),
         priceOverride: z.number().optional(),
@@ -70,28 +72,20 @@ export const productSchema = z.object({
 export const cartItemSchema = z.object({
   variantId: z.string().min(1, 'Variant is required'),
   quantity: z.number().min(1, 'Quantity must be at least 1'),
-  printingEnabled: z.boolean().default(false),
-  printingName: z
-    .string()
-    .max(15, 'Printing name must be 15 characters or less')
-    .regex(/^[A-Za-z\s]*$/, 'Printing name can only contain letters and spaces')
-    .optional()
-    .or(z.literal('')),
-  printingNumber: z
-    .string()
-    .max(3, 'Printing number must be 3 digits or less')
-    .regex(/^\d{0,3}$/, 'Printing number must be digits only')
-    .optional()
-    .or(z.literal('')),
 })
 
 export const shippingAddressSchema = z.object({
   street: z.string().min(1, 'Street address is required'),
   city: z.string().min(1, 'City is required'),
-  state: z.string().min(1, 'State is required'),
+  state: z.string().min(1, 'State or county is required'),
   postalCode: z.string().min(1, 'Postal code is required'),
   country: z.string().default('Kenya'),
   phone: z.string().min(1, 'Phone number is required'),
+  notes: z
+    .string()
+    .max(1000, 'Artwork notes must be 1000 characters or less')
+    .optional()
+    .or(z.literal('')),
 })
 
 export const orderStatusSchema = z.object({
@@ -104,16 +98,6 @@ export const orderStatusSchema = z.object({
     'REFUNDED',
   ]),
 })
-
-export const printingNameSchema = z
-  .string()
-  .max(15, 'Printing name must be 15 characters or less')
-  .regex(/^[A-Za-z\s]*$/, 'Printing name can only contain letters and spaces')
-
-export const printingNumberSchema = z
-  .string()
-  .max(3, 'Printing number must be 3 digits or less')
-  .regex(/^\d{0,3}$/, 'Printing number must be digits only')
 
 export const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),

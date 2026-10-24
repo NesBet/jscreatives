@@ -5,6 +5,7 @@ import { useAuth } from "@/components/layout/auth-provider";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { formatPrice } from "@/lib/utils";
+import { categoryLabel } from "@/constants";
 
 interface DashboardData {
   totalRevenue: number;
@@ -12,11 +13,11 @@ interface DashboardData {
   totalUsers: number;
   lowStockAlerts: {
     id: string;
-    size: string;
+    option: string;
     stock: number;
-    product: { name: string; club: string };
+    product: { name: string; category: string };
   }[];
-  topSellingClubs: { club: string; totalSold: number }[];
+  topSellingCategories: { category: string; totalSold: number }[];
   recentOrders: {
     id: string;
     status: string;
@@ -107,7 +108,7 @@ export default function AdminDashboardPage() {
                   <thead>
                     <tr className="border-b border-slate-700 text-slate-400">
                       <th className="pb-2 font-medium">Product</th>
-                      <th className="pb-2 font-medium">Size</th>
+                      <th className="pb-2 font-medium">Option</th>
                       <th className="pb-2 font-medium text-right">Stock</th>
                     </tr>
                   </thead>
@@ -115,9 +116,9 @@ export default function AdminDashboardPage() {
                     {data.lowStockAlerts.map((alert) => (
                       <tr key={alert.id} className="border-b border-slate-700/50">
                         <td className="py-2 text-white">
-                          {alert.product.club} - {alert.product.name}
+                          {alert.product.name}
                         </td>
-                        <td className="py-2 text-slate-300">{alert.size}</td>
+                        <td className="py-2 text-slate-300">{alert.option}</td>
                         <td className="py-2 text-right">
                           <span className="text-red-400 font-medium">{alert.stock}</span>
                         </td>
@@ -129,15 +130,18 @@ export default function AdminDashboardPage() {
             )}
           </div>
 
-          {/* Top Selling Clubs */}
+          {/* Top Selling Categories */}
           <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 p-6">
-            <h3 className="mb-4 text-lg font-semibold text-white">Top Selling Clubs</h3>
+            <h3 className="mb-4 text-lg font-semibold text-white">Top Selling Categories</h3>
             <div className="space-y-3">
-              {data.topSellingClubs.map((club) => (
-                <div key={club.club} className="flex items-center justify-between">
-                  <span className="text-sm text-slate-300">{club.club}</span>
+              {data.topSellingCategories.length === 0 && (
+                <p className="text-sm text-slate-400">No sales data yet.</p>
+              )}
+              {data.topSellingCategories.map((item) => (
+                <div key={item.category} className="flex items-center justify-between">
+                  <span className="text-sm text-slate-300">{categoryLabel(item.category)}</span>
                   <span className="text-sm font-medium text-white">
-                    {club.totalSold} sold
+                    {item.totalSold} sold
                   </span>
                 </div>
               ))}
@@ -181,7 +185,7 @@ export default function AdminDashboardPage() {
                       </span>
                     </td>
                     <td className="py-3 text-slate-400">
-                      {new Date(order.createdAt).toLocaleDateString("en-NG")}
+                      {new Date(order.createdAt).toLocaleDateString("en-KE")}
                     </td>
                   </tr>
                 ))}

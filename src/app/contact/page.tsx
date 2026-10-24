@@ -91,8 +91,8 @@ export default function ContactPage() {
             Contact <span className="gradient-text">Us</span>
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            Questions about an order, custom printing or anything else? Send us a message and our
-            team will get back to you.
+            Planning a rebrand, a merchandise drop or a print run? Tell us what you have in mind
+            and our studio will get back to you with a clear next step.
           </p>
         </header>
 
@@ -137,7 +137,7 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={handleChange}
                   error={errors.message}
-                  placeholder="How can we help you?"
+                  placeholder="Tell us about your brand, quantities and deadline..."
                   rows={5}
                 />
                 <div>
@@ -157,20 +157,20 @@ export default function ContactPage() {
                   <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>We respond to every message within one business day.</span>
+                  <span>We reply to every project enquiry within one business day.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span>WhatsApp support available for order updates.</span>
+                  <span>WhatsApp is best for quick questions and order updates.</span>
                 </li>
               </ul>
             </div>
             <div className={cn("rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 p-6")}>
               <p className="text-sm text-slate-400">
-                Prefer browsing? Explore our full collection of premium kits and custom printing
-                options.
+                Prefer to browse? Our shop has apparel, bags, drinkware, stationery, signage
+                and packaging ready to brand.
               </p>
               <Link
                 href="/catalog"

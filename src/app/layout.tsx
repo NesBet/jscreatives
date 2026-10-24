@@ -22,9 +22,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JSCREATIVES - Football Jerseys & Custom Printing",
+  title: "JSCREATIVES - Branding, Merchandise & Print Studio in Kenya",
   description:
-    "Premium football jerseys with custom name & number printing. Shop official and replica kits from top clubs worldwide.",
+    "JSCREATIVES is a Nairobi branding and print studio. We design identities, branded apparel, packaging, stationery and signage for businesses across Kenya.",
   icons: {
     icon: "/jscreatives.jpg",
     apple: "/jscreatives.jpg",

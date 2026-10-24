@@ -1,35 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { useCart } from "@/components/layout/cart-provider";
 import { CartItem } from "@/components/cart/cart-item";
 import { CartSummary } from "@/components/cart/cart-summary";
-import { useToast } from "@/components/ui/toast";
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, togglePrinting, updatePrinting, clearCart, loading, updating } = useCart();
-  const { toast } = useToast();
-
-  const printingIncomplete = items.some(
-    (item) =>
-      item.printingEnabled &&
-      (!item.printingName?.trim() || !item.printingNumber?.trim())
-  );
-
-  const handleTogglePrinting = useCallback(
-    async (itemId: string, enabled: boolean, name?: string, number?: string) => {
-      try {
-        await togglePrinting(itemId, enabled, name, number);
-        toast("success", enabled ? "Printing enabled" : "Printing disabled");
-      } catch {
-        toast("error", "Failed to update printing");
-      }
-    },
-    [togglePrinting, toast]
-  );
+  const { items, updateQuantity, removeItem, clearCart, loading, updating } = useCart();
 
   if (loading) {
     return (
@@ -37,7 +16,7 @@ export default function CartPage() {
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-48 rounded bg-slate-800" />
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-32 rounded-xl bg-slate-800" />
+            <div key={i} className="h-32 rounded-2xl bg-slate-800" />
           ))}
         </div>
       </div>
@@ -47,24 +26,27 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center animate-fade-in">
-        <svg className="h-20 w-20 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-        </svg>
-        <h2 className="mt-6 text-2xl font-bold text-white animate-fade-in-up">Your cart is empty</h2>
-        <p className="mt-2 animate-fade-in-up text-slate-400" style={{ animationDelay: "100ms" }}>
-          Add some jerseys to get started!
-        </p>
-        <Link href="/catalog" className="mt-8 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-          <div className={cn(buttonVariants({ variant: "primary", size: "lg" }))}>Browse Jerseys</div>
+        <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-card)]">
+          <svg className="h-9 w-9 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <h2 className="mt-6 text-2xl font-bold text-white font-[var(--font-display)]">Your cart is empty</h2>
+        <p className="mt-2 text-slate-400">Browse the shop to add branded merchandise and print.</p>
+        <Link href="/catalog" className="mt-8">
+          <div className={cn(buttonVariants({ variant: "primary", size: "lg" }))}>Browse the Shop</div>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 animate-fade-in">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16 animate-fade-in">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-500">Your Order</p>
+          <h1 className="mt-2 text-3xl font-bold text-white font-[var(--font-display)]">Shopping Cart</h1>
+        </div>
         <Link href="/catalog" className="text-sm text-slate-400 transition-colors duration-200 hover:text-white">
           Continue shopping &rarr;
         </Link>
@@ -78,8 +60,6 @@ export default function CartPage() {
                 key={item.id}
                 item={item}
                 onUpdateQuantity={updateQuantity}
-                onTogglePrinting={handleTogglePrinting}
-                onUpdatePrinting={updatePrinting}
                 onRemove={removeItem}
                 updating={updating.has(item.id)}
               />
@@ -95,27 +75,12 @@ export default function CartPage() {
 
         <div className="space-y-4 lg:col-span-1">
           <CartSummary items={items} />
-          {printingIncomplete ? (
-            <div
-              aria-disabled="true"
-              title="Enter a name and number for printing on every printed item before checkout"
-              className={cn(
-                buttonVariants({ variant: "primary", size: "lg" }),
-                "w-full cursor-not-allowed opacity-50"
-              )}
-            >
-              Proceed to Checkout
-            </div>
-          ) : (
-            <Link href="/checkout" className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}>
-              Proceed to Checkout
-            </Link>
-          )}
-          {printingIncomplete && (
-            <p className="text-center text-xs text-red-400">
-              Enter a name and number for all printed items to continue.
-            </p>
-          )}
+          <Link href="/checkout" className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}>
+            Proceed to Checkout
+          </Link>
+          <p className="text-center text-xs text-slate-500">
+            Add artwork or brand notes at checkout. We will confirm proofs before production.
+          </p>
         </div>
       </div>
     </div>

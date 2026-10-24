@@ -24,7 +24,8 @@ export async function GET(request: Request) {
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },
-        { club: { contains: search, mode: 'insensitive' } },
+        { slug: { contains: search, mode: 'insensitive' } },
+        { material: { contains: search, mode: 'insensitive' } },
       ]
     }
 
@@ -83,9 +84,9 @@ export async function POST(request: Request) {
 
       if (variants && variants.length > 0) {
         await tx.productVariant.createMany({
-          data: variants.map((v: { size: string; sku: string; stock: number; priceOverride?: number }) => ({
+          data: variants.map((v: { option: string; sku: string; stock: number; priceOverride?: number }) => ({
             productId: newProduct.id,
-            size: v.size,
+            option: v.option,
             sku: v.sku,
             stock: v.stock,
             priceOverride: v.priceOverride || null,

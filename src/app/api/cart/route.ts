@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { cartItemSchema } from '@/lib/validations'
-import { PRINTING_SURCHARGE } from '@/constants'
 
 async function findOrCreateCart(userId: string) {
   let cart = await prisma.cart.findUnique({ where: { userId } })
@@ -59,7 +58,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { variantId, quantity, printingEnabled, printingName, printingNumber } = parsed.data
+    const { variantId, quantity } = parsed.data
 
     const variant = await prisma.productVariant.findUnique({
       where: { id: variantId },
@@ -74,19 +73,12 @@ export async function POST(request: Request) {
 
     const cart = await findOrCreateCart(user.id)
 
-    const basePrice = variant.priceOverride
+    const unitPrice = variant.priceOverride
       ? parseFloat(variant.priceOverride.toString())
       : parseFloat(variant.product.basePrice.toString())
-    const unitPrice = printingEnabled ? basePrice + PRINTING_SURCHARGE : basePrice
 
     const existingItem = await prisma.cartItem.findFirst({
-      where: {
-        cartId: cart.id,
-        variantId,
-        printingEnabled,
-        printingName: printingName || null,
-        printingNumber: printingNumber || null,
-      },
+      where: { cartId: cart.id, variantId },
     })
 
     if (existingItem) {
@@ -100,9 +92,6 @@ export async function POST(request: Request) {
           cartId: cart.id,
           variantId,
           quantity,
-          printingEnabled,
-          printingName: printingName || null,
-          printingNumber: printingNumber || null,
           unitPrice,
         },
       })

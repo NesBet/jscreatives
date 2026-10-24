@@ -6,22 +6,22 @@ import Link from "next/link";
 import { useAuth } from "@/components/layout/auth-provider";
 import { useCart } from "@/components/layout/cart-provider";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
+import { categoryLabel, printMethodLabel, ORDER_NOTES_MAX } from "@/constants";
 import { formatPrice } from "@/lib/utils";
-import { PRINTING_SURCHARGE } from "@/constants";
 
 interface CartItemData {
   id: string;
   quantity: number;
-  printingEnabled: boolean;
-  printingName: string;
-  printingNumber: string;
   unitPrice: number | string;
   variant: {
+    option: string;
     product: {
-      club: string;
-      kitType: string;
+      name: string;
+      category: string;
+      printMethod: string;
     };
   };
 }
@@ -39,6 +39,7 @@ export default function CheckoutPage() {
     state: "",
     postalCode: "",
     phone: "",
+    notes: "",
   });
 
   useEffect(() => {
@@ -52,14 +53,8 @@ export default function CheckoutPage() {
     (sum, i) => sum + Number(i.unitPrice) * i.quantity,
     0
   );
-  const printingTotal = cartItems.reduce(
-    (sum, i) =>
-      sum + (i.printingEnabled ? PRINTING_SURCHARGE * i.quantity : 0),
-    0
-  );
-  const total = subtotal + printingTotal;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -67,26 +62,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // 0. Ensure custom printing items have a name & number filled in
-      const missingPrinting = cartItems.find(
-        (i) =>
-          i.printingEnabled &&
-          (!i.printingName?.trim() || !i.printingNumber?.trim())
-      );
-      if (missingPrinting) {
-        toast(
-          "error",
-          "Please enter a name and number for every jersey with custom printing before checkout."
-        );
-        setSubmitting(false);
-        return;
-      }
-
-      // 1. Create the order (cart stays intact until payment succeeds)
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, country: "Kenya" }),
       });
 
       if (!orderRes.ok) {
@@ -96,7 +75,6 @@ export default function CheckoutPage() {
 
       const { order } = await orderRes.json();
 
-      // 2. Initialize the Paystack transaction to get an access_code
       const initRes = await fetch("/api/payments/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,17 +88,14 @@ export default function CheckoutPage() {
 
       const { accessCode, reference } = await initRes.json();
 
-      // 3. Launch the Paystack inline popup
       const PaystackPop = (await import("@paystack/inline-js")).default;
       const popup = new PaystackPop();
       popup.resumeTransaction(accessCode, {
         onSuccess: async () => {
-          // Payment succeeded: clear the cart now that stock is deducted server-side
           await clearCart();
           router.push(`/orders/${order.id}?ref=${reference}`);
         },
         onCancel: () => {
-          // Keep the cart intact so the customer can retry
           setSubmitting(false);
           toast("info", "Payment cancelled — your cart is still saved");
         },
@@ -151,22 +126,22 @@ export default function CheckoutPage() {
         <h2 className="text-2xl font-bold text-white">Cart is empty</h2>
         <p className="mt-2 text-slate-400">Add items before checking out.</p>
         <Link href="/catalog">
-          <Button className="mt-6">Browse Jerseys</Button>
+          <Button className="mt-6">Browse the Shop</Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold text-white">Checkout</h1>
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-500">Secure Checkout</p>
+      <h1 className="mt-2 text-3xl font-bold text-white font-[var(--font-display)]">Checkout</h1>
 
       <form onSubmit={handleSubmit} className="mt-8 grid gap-8 lg:grid-cols-3">
-        {/* Shipping Address */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">
-              Shipping Address
+        <div className="space-y-6 lg:col-span-2">
+          <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 p-6">
+            <h2 className="mb-4 text-lg font-semibold text-white font-[var(--font-display)]">
+              Delivery Address
             </h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
@@ -176,7 +151,7 @@ export default function CheckoutPage() {
                   value={form.street}
                   onChange={handleChange}
                   required
-                  placeholder="123 Street Name"
+                  placeholder="Building, street and area"
                 />
               </div>
               <Input
@@ -185,15 +160,15 @@ export default function CheckoutPage() {
                 value={form.city}
                 onChange={handleChange}
                 required
-                placeholder="Lagos"
+                placeholder="Nairobi"
               />
               <Input
-                label="State"
+                label="County / State"
                 name="state"
                 value={form.state}
                 onChange={handleChange}
                 required
-                placeholder="Lagos State"
+                placeholder="Nairobi County"
               />
               <Input
                 label="Postal Code"
@@ -201,7 +176,7 @@ export default function CheckoutPage() {
                 value={form.postalCode}
                 onChange={handleChange}
                 required
-                placeholder="100001"
+                placeholder="00100"
               />
               <Input
                 label="Phone Number"
@@ -210,51 +185,62 @@ export default function CheckoutPage() {
                 value={form.phone}
                 onChange={handleChange}
                 required
-                placeholder="+234 800 000 0000"
+                placeholder="+254 7XX XXX XXX"
               />
             </div>
           </div>
+
+          <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 p-6">
+            <h2 className="mb-2 text-lg font-semibold text-white font-[var(--font-display)]">
+              Artwork &amp; Branding Notes
+            </h2>
+            <p className="mb-4 text-xs leading-relaxed text-slate-500">
+              Tell us about logos, colours, print placement or anything we should know. Our team will
+              send a digital proof before production begins.
+            </p>
+            <Textarea
+              label="Order notes (optional)"
+              name="notes"
+              value={form.notes}
+              onChange={handleChange}
+              placeholder="e.g. Pantone 485 C logo on the left chest, names listed in the attached brief..."
+              rows={4}
+              maxLength={ORDER_NOTES_MAX}
+            />
+          </div>
         </div>
 
-        {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 p-6 sticky top-24">
-            <h2 className="mb-4 text-lg font-semibold text-white">Order Summary</h2>
+          <div className="sticky top-24 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 p-6">
+            <h2 className="mb-4 text-lg font-semibold text-white font-[var(--font-display)]">Order Summary</h2>
             <div className="space-y-3 text-sm">
-              {(items as CartItemData[]).map((item) => (
-                <div key={item.id} className="flex justify-between text-slate-300">
-                  <span className="truncate">
-                    {item.variant.product.club} {item.variant.product.kitType} x{item.quantity}
-                    {item.printingEnabled && (
-                      <span className="text-red-400">
-                        {" "}
-                        (Print: {item.printingName || "—"} #{item.printingNumber || "—"})
-                      </span>
-                    )}
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex justify-between gap-3 text-slate-300">
+                  <span className="min-w-0">
+                    <span className="block truncate text-white">{item.variant.product.name}</span>
+                    <span className="block text-xs text-slate-500">
+                      {categoryLabel(item.variant.product.category)} &middot; {item.variant.option} &middot;{" "}
+                      {printMethodLabel(item.variant.product.printMethod)} &middot; Qty {item.quantity}
+                    </span>
                   </span>
-                  <span className="ml-2 flex-shrink-0">
-                    {formatPrice(
-                      Number(item.unitPrice) * item.quantity +
-                        (item.printingEnabled ? PRINTING_SURCHARGE * item.quantity : 0)
-                    )}
+                  <span className="flex-shrink-0">
+                    {formatPrice(Number(item.unitPrice) * item.quantity)}
                   </span>
                 </div>
               ))}
-              <div className="border-t border-slate-700 pt-3">
+              <div className="border-t border-[var(--color-border-default)] pt-3">
                 <div className="flex justify-between text-slate-300">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
-                {printingTotal > 0 && (
-                  <div className="flex justify-between text-slate-300">
-                    <span>Printing</span>
-                    <span>{formatPrice(printingTotal)}</span>
-                  </div>
-                )}
+                <div className="mt-2 flex justify-between text-slate-500">
+                  <span>Delivery</span>
+                  <span>Confirmed after order</span>
+                </div>
               </div>
-              <div className="border-t border-slate-700 pt-3 flex justify-between font-bold text-white">
+              <div className="flex justify-between border-t border-[var(--color-border-default)] pt-3 font-bold text-white">
                 <span>Total</span>
-                <span>{formatPrice(total)}</span>
+                <span className="text-red-500">{formatPrice(subtotal)}</span>
               </div>
             </div>
 
@@ -266,6 +252,9 @@ export default function CheckoutPage() {
             >
               Pay with Paystack
             </Button>
+            <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-500">
+              Payment is secure. Production starts after artwork approval.
+            </p>
           </div>
         </div>
       </form>

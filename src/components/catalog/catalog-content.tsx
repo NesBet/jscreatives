@@ -6,7 +6,14 @@ import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { PerPageSelector } from "@/components/ui/per-page-selector";
 import { RevealItem } from "@/components/ui/ScrollReveal";
-import { CLUBS, KIT_TYPES, PRODUCT_PER_PAGE } from "@/constants";
+import {
+  CATEGORY_DESCRIPTIONS,
+  CATEGORY_LABELS,
+  PRINT_METHODS,
+  PRINT_METHOD_LABELS,
+  PRODUCT_CATEGORIES,
+  PRODUCT_PER_PAGE,
+} from "@/constants";
 import { gsap, ScrollTrigger } from "@/lib/gsap-wrapper";
 import { useReducedMotion } from "motion/react";
 
@@ -15,9 +22,9 @@ gsap.registerPlugin(ScrollTrigger);
 interface Product {
   id: string;
   slug: string;
-  club: string;
-  kitType: string;
-  season: string;
+  name: string;
+  category: string;
+  printMethod: string;
   basePrice: number;
   images: { url: string; altText?: string }[];
   variants: { priceOverride?: number | string | null | { toString(): string }; price?: number | string | { toString(): string } }[];
@@ -47,8 +54,8 @@ export function CatalogContent() {
   const [loading, setLoading] = useState(true);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const currentClub = searchParams.get("club") || "";
-  const currentKitType = searchParams.get("kitType") || "";
+  const currentCategory = searchParams.get("category") || "";
+  const currentPrintMethod = searchParams.get("printMethod") || "";
   const currentSort = searchParams.get("sort") || "newest";
   const currentPage = parseInt(searchParams.get("page") || "1");
   const currentPerPage = parseInt(searchParams.get("perPage") || "") || PRODUCT_PER_PAGE;
@@ -72,8 +79,8 @@ export function CatalogContent() {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-        if (currentClub) params.set("club", currentClub);
-        if (currentKitType) params.set("kitType", currentKitType);
+        if (currentCategory) params.set("category", currentCategory);
+        if (currentPrintMethod) params.set("printMethod", currentPrintMethod);
         params.set("sort", currentSort);
         params.set("page", currentPage.toString());
         params.set("perPage", currentPerPage.toString());
@@ -91,14 +98,12 @@ export function CatalogContent() {
       }
     };
     fetchProducts();
-  }, [currentClub, currentKitType, currentSort, currentPage, currentPerPage]);
+  }, [currentCategory, currentPrintMethod, currentSort, currentPage, currentPerPage]);
 
-  // GSAP Scroll Animations
   useEffect(() => {
     if (reduce || !productsRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Animate product cards on load
       gsap.fromTo(
         ".catalog-product-card",
         { opacity: 0, y: 50, scale: 0.95 },
@@ -118,7 +123,6 @@ export function CatalogContent() {
         }
       );
 
-      // Image scale reveal on scroll
       gsap.utils.toArray<HTMLElement>(".catalog-product-image").forEach((imgEl) => {
         gsap.fromTo(
           imgEl,
@@ -143,75 +147,74 @@ export function CatalogContent() {
     return () => ctx.revert();
   }, [products, reduce]);
 
+  const activeCategory = PRODUCT_CATEGORIES.find((category) => category === currentCategory);
+
   const filtersContent = (
     <div className="space-y-8">
-      {/* Club Filter */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold text-white uppercase tracking-wider">Club</h3>
+        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Category</h3>
         <div className="space-y-2">
           <button
-            onClick={() => updateParams("club", "")}
-            className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition-all duration-300 ${
-              !currentClub
-                ? "bg-red-600/10 text-red-500 border border-red-500/30"
-                : "text-slate-400 hover:bg-slate-800/50 hover:text-white border border-slate-700/50"
+            onClick={() => updateParams("category", "")}
+            className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300 ${
+              !currentCategory
+                ? "border-red-500/30 bg-red-600/10 text-red-500"
+                : "border-slate-700/50 text-slate-400 hover:bg-slate-800/50 hover:text-white"
             }`}
           >
-            All Clubs
+            All Merchandise
           </button>
-          {CLUBS.map((c) => (
+          {PRODUCT_CATEGORIES.map((category) => (
             <button
-              key={c}
-              onClick={() => updateParams("club", c)}
-              className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition-all duration-300 ${
-                currentClub === c
-                  ? "bg-red-600/10 text-red-500 border border-red-500/30"
-                  : "text-slate-400 hover:bg-slate-800/50 hover:text-white border border-slate-700/50"
+              key={category}
+              onClick={() => updateParams("category", category)}
+              className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300 ${
+                currentCategory === category
+                  ? "border-red-500/30 bg-red-600/10 text-red-500"
+                  : "border-slate-700/50 text-slate-400 hover:bg-slate-800/50 hover:text-white"
               }`}
             >
-              {c}
+              {CATEGORY_LABELS[category]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Kit Type Filter */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold text-white uppercase tracking-wider">Kit Type</h3>
+        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Print Method</h3>
         <div className="space-y-2">
           <button
-            onClick={() => updateParams("kitType", "")}
-            className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition-all duration-300 ${
-              !currentKitType
-                ? "bg-red-600/10 text-red-500 border border-red-500/30"
-                : "text-slate-400 hover:bg-slate-800/50 hover:text-white border border-slate-700/50"
+            onClick={() => updateParams("printMethod", "")}
+            className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300 ${
+              !currentPrintMethod
+                ? "border-red-500/30 bg-red-600/10 text-red-500"
+                : "border-slate-700/50 text-slate-400 hover:bg-slate-800/50 hover:text-white"
             }`}
           >
-            All Types
+            All Methods
           </button>
-          {KIT_TYPES.map((kt) => (
+          {PRINT_METHODS.map((method) => (
             <button
-              key={kt}
-              onClick={() => updateParams("kitType", kt)}
-              className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition-all duration-300 ${
-                currentKitType === kt
-                  ? "bg-red-600/10 text-red-500 border border-red-500/30"
-                  : "text-slate-400 hover:bg-slate-800/50 hover:text-white border border-slate-700/50"
+              key={method}
+              onClick={() => updateParams("printMethod", method)}
+              className={`block w-full rounded-xl border px-4 py-3 text-left text-sm transition-all duration-300 ${
+                currentPrintMethod === method
+                  ? "border-red-500/30 bg-red-600/10 text-red-500"
+                  : "border-slate-700/50 text-slate-400 hover:bg-slate-800/50 hover:text-white"
               }`}
             >
-              {kt.charAt(0) + kt.slice(1).toLowerCase()}
+              {PRINT_METHOD_LABELS[method]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Sort */}
       <div>
-        <h3 className="mb-4 text-sm font-semibold text-white uppercase tracking-wider">Sort By</h3>
+        <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Sort By</h3>
         <select
           value={currentSort}
           onChange={(e) => updateParams("sort", e.target.value)}
-          className="w-full rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-sm text-white focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30 transition-all duration-300"
+          className="w-full rounded-xl border border-slate-700/50 bg-slate-900/50 px-4 py-3 text-sm text-white transition-all duration-300 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/30"
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -224,42 +227,46 @@ export function CatalogContent() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16 lg:px-8">
-      <div className="flex items-center justify-between mb-12">
-        <div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white font-(--font-display)]">
-            Shop Jerseys
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <div className="flex items-end justify-between gap-6 mb-12">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-500">The Brand Shop</p>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl font-[var(--font-display)]">
+            Merchandise &amp; print, made to carry your brand.
           </h1>
+          <p className="mt-4 text-sm leading-relaxed text-slate-400">
+            {activeCategory
+              ? CATEGORY_DESCRIPTIONS[activeCategory]
+              : "Explore apparel, bags, drinkware, stationery, signage and packaging produced by our Nairobi studio."}
+          </p>
           {pagination && (
-            <p className="mt-2 text-sm text-slate-400">
-              {pagination.total} product{pagination.total !== 1 ? "s" : ""} found
+            <p className="mt-3 text-xs text-slate-500">
+              {pagination.total} product{pagination.total !== 1 ? "s" : ""} available
             </p>
           )}
         </div>
         <button
           onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-          className="rounded-xl border border-slate-700/50 bg-slate-800/50 px-5 py-3 text-sm text-slate-300 hover:bg-slate-800 hover:text-white lg:hidden transition-all duration-300"
+          className="shrink-0 rounded-xl border border-slate-700/50 bg-slate-800/50 px-5 py-3 text-sm text-slate-300 transition-all duration-300 hover:bg-slate-800 hover:text-white lg:hidden"
         >
           Filters
         </button>
       </div>
 
       <div className="flex gap-8 lg:gap-12">
-        {/* Sidebar - Desktop */}
         <aside className="hidden w-64 shrink-0 lg:block">
           <div className="sticky top-24">{filtersContent}</div>
         </aside>
 
-        {/* Mobile Filter Drawer */}
         {mobileFiltersOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-black/50" onClick={() => setMobileFiltersOpen(false)} />
-            <div className="absolute left-0 top-0 h-full w-80 max-w-full overflow-y-auto bg-slate-950/95 backdrop-blur-2xl border-r border-slate-800 p-6">
-              <div className="flex items-center justify-between mb-8">
+            <div className="absolute left-0 top-0 h-full w-80 max-w-full overflow-y-auto border-r border-slate-800 bg-slate-950/95 p-6 backdrop-blur-2xl">
+              <div className="mb-8 flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-white">Filters</h2>
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-400 transition-colors hover:text-white"
                 >
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -271,17 +278,16 @@ export function CatalogContent() {
           </div>
         )}
 
-        {/* Product Grid */}
         <div className="flex-1">
           {loading ? (
-            <div ref={productsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" style={{ gridAutoFlow: "dense" }}>
+            <div ref={productsRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoFlow: "dense" }}>
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="catalog-product-card animate-pulse rounded-2xl overflow-hidden bg-slate-800/50">
-                  <div className="aspect-4/5 bg-slate-800" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-5 bg-slate-700 rounded w-3/4" />
-                    <div className="h-4 bg-slate-700 rounded w-1/2" />
-                    <div className="h-6 bg-slate-700 rounded w-1/3" />
+                <div key={i} className="catalog-product-card animate-pulse overflow-hidden rounded-2xl bg-slate-800/50">
+                  <div className="aspect-[4/5] bg-slate-800" />
+                  <div className="space-y-3 p-5">
+                    <div className="h-5 w-3/4 rounded bg-slate-700" />
+                    <div className="h-4 w-1/2 rounded bg-slate-700" />
+                    <div className="h-6 w-1/3 rounded bg-slate-700" />
                   </div>
                 </div>
               ))}
@@ -292,14 +298,14 @@ export function CatalogContent() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
               <h3 className="mt-6 text-2xl font-semibold text-white">No products found</h3>
-              <p className="mt-3 text-slate-400">Try adjusting your filters or search terms.</p>
+              <p className="mt-3 text-slate-400">Try a different category or print method.</p>
               <Button variant="secondary" className="mt-6" onClick={() => router.push("/catalog")}>
                 Clear Filters
               </Button>
             </div>
           ) : (
             <>
-              <div ref={productsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" style={{ gridAutoFlow: "dense" }}>
+              <div ref={productsRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4" style={{ gridAutoFlow: "dense" }}>
                 {products.map((product) => (
                   <RevealItem key={product.id} index={products.indexOf(product)}>
                     <div className="catalog-product-card">
@@ -309,7 +315,6 @@ export function CatalogContent() {
                 ))}
               </div>
 
-              {/* Pagination */}
               {pagination && pagination.totalPages > 1 && (
                 <div className="mt-16 flex flex-wrap items-center justify-center gap-4">
                   <Button
@@ -321,7 +326,7 @@ export function CatalogContent() {
                   >
                     Previous
                   </Button>
-                  <span className="flex items-center px-4 text-sm text-slate-400 font-medium">
+                  <span className="flex items-center px-4 text-sm font-medium text-slate-400">
                     Page {currentPage} of {pagination.totalPages}
                   </span>
                   <Button

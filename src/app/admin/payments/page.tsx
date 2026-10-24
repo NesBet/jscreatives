@@ -110,8 +110,8 @@ export default function AdminPaymentsPage() {
                     <td className="p-4 text-slate-300">{p.channel || "N/A"}</td>
                     <td className="p-4 text-slate-400">
                       {p.paidAt
-                        ? new Date(p.paidAt).toLocaleDateString("en-NG")
-                        : new Date(p.createdAt).toLocaleDateString("en-NG")}
+                        ? new Date(p.paidAt).toLocaleDateString("en-KE")
+                        : new Date(p.createdAt).toLocaleDateString("en-KE")}
                     </td>
                   </tr>
                 ))

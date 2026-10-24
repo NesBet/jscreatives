@@ -9,15 +9,12 @@ import { formatPrice } from "@/lib/utils";
 interface OrderItem {
   id: string;
   productName: string;
-  productClub: string;
-  productKitType: string;
-  productSize: string;
+  productCategory: string;
+  productMethod: string;
+  productOption: string;
   productImage: string | null;
   quantity: number;
   unitPrice: number | string;
-  printingEnabled: boolean;
-  printingName: string | null;
-  printingNumber: string | null;
   subtotal: number | string;
 }
 
@@ -36,6 +33,7 @@ interface Order {
   shippingState: string;
   shippingPostalCode: string;
   shippingPhone: string;
+  notes: string | null;
   items: OrderItem[];
   payment: Payment | null;
 }
@@ -110,7 +108,7 @@ function OrderConfirmationPage() {
         <h2 className="text-2xl font-bold text-white">Order not found</h2>
         <p className="mt-2 text-slate-400">{error}</p>
         <Link href="/catalog" className="mt-6">
-          <Button>Browse Jerseys</Button>
+          <Button>Browse the Shop</Button>
         </Link>
       </div>
     );
@@ -169,11 +167,10 @@ function OrderConfirmationPage() {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-white">
-                  {item.productClub} {item.productKitType}
+                  {item.productName}
                 </p>
                 <p className="text-xs text-slate-400">
-                  Size {item.productSize}
-                  {item.printingEnabled && ` · Print: ${item.printingName || ""} ${item.printingNumber || ""}`.trim()}
+                  {item.productCategory} &middot; {item.productMethod} &middot; {item.productOption}
                 </p>
               </div>
               <div className="text-right">
@@ -193,6 +190,13 @@ function OrderConfirmationPage() {
           <p>Shipping to: {order.shippingStreet}, {order.shippingCity}, {order.shippingState} {order.shippingPostalCode}</p>
           <p>Phone: {order.shippingPhone}</p>
         </div>
+
+        {order.notes && (
+          <div className="mt-4 rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Artwork &amp; branding notes</p>
+            <p className="mt-1 whitespace-pre-wrap text-xs text-slate-300">{order.notes}</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex gap-4">

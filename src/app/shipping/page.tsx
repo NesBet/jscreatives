@@ -5,21 +5,21 @@ import { MagneticButton } from "@/components/ui/MagneticButton";
 export const metadata = {
   title: "Shipping Info - JSCREATIVES",
   description:
-    "Delivery times, costs and tracking for JSCREATIVES jersey orders across Kenya.",
+    "Delivery times, costs and tracking for JSCREATIVES merchandise and print orders across Kenya.",
 };
 
 const steps = [
   {
     title: "Place Your Order",
-    description: "Choose your jersey, add custom printing if you like, and check out securely with Paystack.",
+    description: "Order stocked merchandise online, or approve a project quote for custom production.",
   },
   {
-    title: "We Prepare & Print",
-    description: "Your kit is quality-checked and, if selected, professionally heat-pressed with your name & number.",
+    title: "We Produce & Check",
+    description: "Your pieces are printed, embroidered or finished, then quality-checked against the approved proof.",
   },
   {
     title: "Tracked Delivery",
-    description: "We hand off to our courier and email you tracking details so you can follow your order to your door.",
+    description: "We hand off to our courier and share tracking details so you can follow the order to your door.",
   },
 ];
 
@@ -43,8 +43,8 @@ export default function ShippingPage() {
             Shipping <span className="gradient-text">Info</span>
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            We deliver premium jerseys across Kenya with tracking on every order. Here&apos;s what to
-            expect from checkout to your doorstep.
+            We deliver branded merchandise and print projects across Kenya with tracking on every
+            order. Here&apos;s what to expect from checkout to your doorstep.
           </p>
         </header>
 
@@ -98,7 +98,7 @@ export default function ShippingPage() {
             <h3 className="text-xl font-semibold text-white font-[var(--font-display)]">Tracking</h3>
             <p className="mt-3 text-sm leading-relaxed text-slate-400">
               Every order ships with tracking. You&apos;ll get a tracking link by email as soon as your
-              jersey leaves our facility.
+              order leaves our studio.
             </p>
           </DoubleBezelCard>
           <DoubleBezelCard padding="lg" className="animate-fade-in-up">
@@ -112,7 +112,7 @@ export default function ShippingPage() {
 
         <section className="mt-20 flex flex-col items-center gap-6 rounded-3xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 px-6 py-14 text-center animate-fade-in-up">
           <h2 className="text-3xl font-bold tracking-tight text-white font-[var(--font-display)]">
-            Found something you love?
+            Ready to brand your next drop?
           </h2>
           <div className="mt-4 flex flex-wrap justify-center gap-4">
             <MagneticButton size="lg" href="/catalog">

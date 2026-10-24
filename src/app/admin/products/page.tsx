@@ -6,14 +6,21 @@ import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
 import { PerPageSelector } from "@/components/ui/per-page-selector";
 import { formatPrice } from "@/lib/utils";
-import { CLUBS, KIT_TYPES, PRODUCT_PER_PAGE } from "@/constants";
+import {
+  CATEGORY_LABELS,
+  PRINT_METHODS,
+  PRINT_METHOD_LABELS,
+  PRODUCT_CATEGORIES,
+  PRODUCT_PER_PAGE,
+} from "@/constants";
 
 interface ProductVariant {
   id: string;
-  size: string;
+  option: string;
   sku: string;
   stock: number;
   priceOverride: number | null;
@@ -23,9 +30,11 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  club: string;
-  kitType: string;
-  season: string;
+  description: string;
+  category: string;
+  printMethod: string;
+  material: string;
+  turnaround: string;
   basePrice: number;
   active: boolean;
   featured: boolean;
@@ -33,11 +42,25 @@ interface Product {
 }
 
 interface VariantForm {
-  size: string;
+  option: string;
   sku: string;
   stock: string;
   priceOverride: string;
 }
+
+const emptyForm = () => ({
+  name: "",
+  slug: "",
+  description: "",
+  category: PRODUCT_CATEGORIES[0] as string,
+  printMethod: PRINT_METHODS[0] as string,
+  material: "",
+  turnaround: "",
+  basePrice: 0,
+  active: true,
+  featured: false,
+  variants: [{ option: "", sku: "", stock: "", priceOverride: "" }],
+});
 
 export default function AdminProductsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -53,29 +76,7 @@ export default function AdminProductsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState<{
-    name: string;
-    slug: string;
-    description: string;
-    club: string;
-    kitType: string;
-    season: string;
-    basePrice: number;
-    active: boolean;
-    featured: boolean;
-    variants: VariantForm[];
-  }>({
-    name: "",
-    slug: "",
-    description: "",
-    club: CLUBS[0] as string,
-    kitType: "HOME",
-    season: "",
-    basePrice: 0,
-    active: true,
-    featured: false,
-    variants: [{ size: "", sku: "", stock: "", priceOverride: "" }],
-  });
+  const [form, setForm] = useState<ReturnType<typeof emptyForm>>(emptyForm());
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "ADMIN")) router.push("/");
@@ -106,18 +107,7 @@ export default function AdminProductsPage() {
 
   const handleCreate = () => {
     setEditingProduct(null);
-    setForm({
-      name: "",
-      slug: "",
-      description: "",
-      club: CLUBS[0] as string,
-      kitType: "HOME",
-      season: "",
-      basePrice: 0,
-      active: true,
-      featured: false,
-      variants: [{ size: "", sku: "", stock: "", priceOverride: "" }],
-    });
+    setForm(emptyForm());
     setShowModal(true);
   };
 
@@ -126,22 +116,23 @@ export default function AdminProductsPage() {
     setForm({
       name: product.name,
       slug: product.slug,
-      description: "",
-      club: product.club,
-      kitType: product.kitType,
-      season: product.season,
+      description: product.description,
+      category: product.category,
+      printMethod: product.printMethod,
+      material: product.material,
+      turnaround: product.turnaround,
       basePrice: Number(product.basePrice),
       active: product.active,
       featured: product.featured,
       variants:
         product.variants.length > 0
           ? product.variants.map((v) => ({
-              size: v.size,
+              option: v.option,
               sku: v.sku,
               stock: String(v.stock),
               priceOverride: v.priceOverride != null ? String(v.priceOverride) : "",
             }))
-          : [{ size: "", sku: "", stock: "", priceOverride: "" }],
+          : [{ option: "", sku: "", stock: "", priceOverride: "" }],
     });
     setShowModal(true);
   };
@@ -170,10 +161,10 @@ export default function AdminProductsPage() {
         : "/api/admin/products";
       const method = editingProduct ? "PUT" : "POST";
       const variants = form.variants
-        .filter((v) => v.size.trim() && v.sku.trim())
+        .filter((v) => v.option.trim() && v.sku.trim())
         .map((v) => {
-          const out: { size: string; sku: string; stock: number; priceOverride?: number } = {
-            size: v.size.trim(),
+          const out: { option: string; sku: string; stock: number; priceOverride?: number } = {
+            option: v.option.trim(),
             sku: v.sku.trim(),
             stock: Number(v.stock) || 0,
           };
@@ -187,9 +178,10 @@ export default function AdminProductsPage() {
           name: form.name,
           slug: form.slug,
           description: form.description,
-          club: form.club,
-          kitType: form.kitType,
-          season: form.season,
+          category: form.category,
+          printMethod: form.printMethod,
+          material: form.material,
+          turnaround: form.turnaround,
           basePrice: Number(form.basePrice),
           active: form.active,
           featured: form.featured,
@@ -221,7 +213,7 @@ export default function AdminProductsPage() {
   const addVariant = () => {
     setForm((f) => ({
       ...f,
-      variants: [...f.variants, { size: "", sku: "", stock: "", priceOverride: "" }],
+      variants: [...f.variants, { option: "", sku: "", stock: "", priceOverride: "" }],
     }));
   };
 
@@ -253,8 +245,8 @@ export default function AdminProductsPage() {
             <thead>
               <tr className="border-b border-slate-700 text-slate-400">
                 <th className="p-4 font-medium">Name</th>
-                <th className="p-4 font-medium">Club</th>
-                <th className="p-4 font-medium">Type</th>
+                <th className="p-4 font-medium">Category</th>
+                <th className="p-4 font-medium">Method</th>
                 <th className="p-4 font-medium">Price</th>
                 <th className="p-4 font-medium">Stock</th>
                 <th className="p-4 font-medium">Active</th>
@@ -280,8 +272,8 @@ export default function AdminProductsPage() {
                   return (
                     <tr key={product.id} className="border-b border-slate-700/50">
                       <td className="p-4 text-white">{product.name}</td>
-                      <td className="p-4 text-slate-300">{product.club}</td>
-                      <td className="p-4 text-slate-300">{product.kitType}</td>
+                      <td className="p-4 text-slate-300">{CATEGORY_LABELS[product.category as keyof typeof CATEGORY_LABELS] ?? product.category}</td>
+                      <td className="p-4 text-slate-300">{PRINT_METHOD_LABELS[product.printMethod as keyof typeof PRINT_METHOD_LABELS] ?? product.printMethod}</td>
                       <td className="p-4 text-white font-medium">
                         {formatPrice(Number(product.basePrice))}
                       </td>
@@ -317,7 +309,6 @@ export default function AdminProductsPage() {
           </table>
         </div>
 
-        {/* Pagination + per-page limiter */}
         {products.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Button
@@ -350,61 +341,80 @@ export default function AdminProductsPage() {
           </div>
         )}
 
-        {/* Modal */}
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 p-6">
+            <div className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 p-6">
               <h2 className="mb-4 text-lg font-semibold text-white">
                 {editingProduct ? "Edit Product" : "Create Product"}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <Input
-                  label="Name"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  required
-                />
-                <Input
-                  label="Slug"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  required
-                />
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
-                    Club
-                  </label>
-                  <select
-                    value={form.club}
-                    onChange={(e) => setForm({ ...form, club: e.target.value })}
-                    className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                  >
-                    {CLUBS.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                  <Input
+                    label="Slug"
+                    value={form.slug}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    required
+                  />
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
-                    Kit Type
-                  </label>
-                  <select
-                    value={form.kitType}
-                    onChange={(e) => setForm({ ...form, kitType: e.target.value })}
-                    className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                  >
-                    {KIT_TYPES.map((kt) => (
-                      <option key={kt} value={kt}>{kt}</option>
-                    ))}
-                  </select>
-                </div>
-                <Input
-                  label="Season"
-                  value={form.season}
-                  onChange={(e) => setForm({ ...form, season: e.target.value })}
+                <Textarea
+                  label="Description"
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                   required
-                  placeholder="2024/25"
+                  rows={3}
                 />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                      Category
+                    </label>
+                    <select
+                      value={form.category}
+                      onChange={(e) => setForm({ ...form, category: e.target.value })}
+                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                    >
+                      {PRODUCT_CATEGORIES.map((c) => (
+                        <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                      Print Method
+                    </label>
+                    <select
+                      value={form.printMethod}
+                      onChange={(e) => setForm({ ...form, printMethod: e.target.value })}
+                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                    >
+                      {PRINT_METHODS.map((m) => (
+                        <option key={m} value={m}>{PRINT_METHOD_LABELS[m]}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Material"
+                    value={form.material}
+                    onChange={(e) => setForm({ ...form, material: e.target.value })}
+                    required
+                    placeholder="e.g. 260gsm cotton"
+                  />
+                  <Input
+                    label="Turnaround"
+                    value={form.turnaround}
+                    onChange={(e) => setForm({ ...form, turnaround: e.target.value })}
+                    required
+                    placeholder="e.g. 5-7 business days"
+                  />
+                </div>
                 <Input
                   label="Base Price (KES)"
                   type="number"
@@ -437,7 +447,7 @@ export default function AdminProductsPage() {
                 <div className="border-t border-slate-700 pt-4">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm font-medium text-slate-300">
-                      Variants (size, SKU &amp; stock)
+                      Variants (option, SKU &amp; stock)
                     </span>
                     <Button type="button" variant="secondary" size="sm" onClick={addVariant}>
                       + Add variant
@@ -455,12 +465,12 @@ export default function AdminProductsPage() {
                         className="flex flex-wrap items-end gap-2 rounded-lg border border-slate-700 bg-slate-800/40 p-2"
                       >
                         <div className="flex flex-col">
-                          <label className="mb-1 text-[10px] text-slate-500">Size</label>
+                          <label className="mb-1 text-[10px] text-slate-500">Option</label>
                           <input
-                            value={v.size}
-                            onChange={(e) => updateVariant(idx, "size", e.target.value)}
-                            placeholder="M"
-                            className="h-9 w-20 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                            value={v.option}
+                            onChange={(e) => updateVariant(idx, "option", e.target.value)}
+                            placeholder="e.g. Standard"
+                            className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -468,7 +478,7 @@ export default function AdminProductsPage() {
                           <input
                             value={v.sku}
                             onChange={(e) => updateVariant(idx, "sku", e.target.value)}
-                            placeholder="JS-M-001"
+                            placeholder="JS-TEE-M"
                             className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
                           />
                         </div>

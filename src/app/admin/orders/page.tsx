@@ -13,15 +13,12 @@ import { PRODUCT_PER_PAGE } from "@/constants";
 interface OrderItem {
   id: string;
   productName: string;
-  productClub: string;
-  productKitType: string;
-  productSize: string;
+  productCategory: string;
+  productMethod: string;
+  productOption: string;
   productImage: string | null;
   quantity: number;
   subtotal: number;
-  printingEnabled: boolean;
-  printingName: string | null;
-  printingNumber: string | null;
 }
 
 interface Order {
@@ -34,6 +31,7 @@ interface Order {
   shippingState: string;
   shippingPostalCode: string;
   shippingPhone: string;
+  notes: string | null;
   user: { name: string | null; email: string };
   items: OrderItem[];
   payment: { status: string; reference: string } | null;
@@ -191,7 +189,7 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
                       <td className="p-4 text-slate-400">
-                        {new Date(order.createdAt).toLocaleDateString("en-NG")}
+                        {new Date(order.createdAt).toLocaleDateString("en-KE")}
                       </td>
                     <td className="p-4">
                       <span className={`font-medium ${statusColors[order.status] || "text-slate-400"}`}>
@@ -221,16 +219,11 @@ export default function AdminOrdersPage() {
                                     )}
                                     <div className="text-sm">
                                       <p className="text-white">
-                                        {item.productClub} {item.productKitType}
+                                        {item.productName}
                                       </p>
                                       <p className="text-slate-400">
-                                        Size {item.productSize} &middot; Qty {item.quantity}
+                                        {item.productCategory} &middot; {item.productMethod} &middot; {item.productOption} &middot; Qty {item.quantity}
                                       </p>
-                                      {item.printingEnabled && (
-                                        <p className="text-red-400">
-                                          Print: {item.printingName || "—"} #{item.printingNumber || "—"}
-                                        </p>
-                                      )}
                                       <p className="text-slate-300">{formatPrice(Number(item.subtotal))}</p>
                                     </div>
                                   </div>
@@ -245,6 +238,12 @@ export default function AdminOrdersPage() {
                                 <p>{order.shippingCity}, {order.shippingState} {order.shippingPostalCode}</p>
                                 <p>Phone: {order.shippingPhone}</p>
                                 <p className="text-slate-500">Ref: {order.payment?.reference}</p>
+                                {order.notes && (
+                                  <div className="mt-3 rounded-lg border border-slate-700 bg-slate-800/50 p-2">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Artwork notes</p>
+                                    <p className="mt-1 whitespace-pre-wrap text-xs text-slate-300">{order.notes}</p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
