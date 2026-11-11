@@ -120,15 +120,9 @@ export async function POST(request: Request) {
       artworkName ? `Artwork: ${artworkName}` : null,
     ].filter((line): line is string => line !== null).join('\n')
 
-    const webhookUrls = Array.from(
-      new Set(
-        [process.env.CONTACT_WEBHOOK_URL, process.env.QUOTE_WEBHOOK_URL].filter(
-          (url): url is string => Boolean(url)
-        )
-      )
-    )
+    const webhookUrl = process.env.QUOTE_WEBHOOK_URL
 
-    if (webhookUrls.length > 0) {
+    if (webhookUrl) {
       const payload = {
         type: 'quote_request',
         subject: `New quote request from ${data.fullName}`,
@@ -152,17 +146,14 @@ export async function POST(request: Request) {
         artworkSize,
       }
 
-      const results = await Promise.allSettled(
-        webhookUrls.map((url) => callN8n(url, payload))
-      )
-
-      results.forEach((result) => {
-        if (result.status === 'rejected') {
-          console.error('Quote webhook failed:', result.reason)
-        } else if (!result.value.ok) {
-          console.error(`Quote webhook returned HTTP ${result.value.status}.`)
+      try {
+        const result = await callN8n(webhookUrl, payload)
+        if (!result.ok) {
+          console.error(`Quote webhook returned HTTP ${result.status}.`)
         }
-      })
+      } catch (error) {
+        console.error('Quote webhook failed:', error)
+      }
     }
 
     return Response.json(
