@@ -14,7 +14,7 @@ export const site = {
   whatsappMessage:
     "Hello JsCreatives, I would like to inquire about your printing and branding services.",
   email: "hello@jscreatives.com",
-  location: "Ramogi Hse, Nairobi, Kenya",
+  location: "Ramogi Hse(Rm 319), Nairobi, Kenya",
   locationNote: "Serving clients across Kenya and East Africa.",
   hours: [
     { days: "Monday to Friday", time: "8:00 AM to 6:00 PM" },
