@@ -45,7 +45,7 @@ export function Logo({ invert = false, className }: LogoProps) {
             invert ? "text-paper/50" : "text-stone"
           )}
         >
-          Print &amp; Brand Studio
+        •Design•Print•Brand
         </span>
       </span>
     </Link>

@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/layout/auth-provider'
 import { useToast } from '@/components/ui/toast'
 import { OtpInput } from '@/components/auth/otp-input'
 import { EAST_AFRICA_COUNTRIES, buildE164 } from '@/constants/countries'
+import { site } from '@/content/site'
 
 type Step = 'phone' | 'signup' | 'otp'
 type Mode = 'login' | 'signup'
@@ -341,10 +343,18 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
           style={fade(0)}
         >
           <div
-            className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-700 text-xl font-black text-white shadow-lg shadow-red-500/30"
-            style={{ animation: 'float 6s ease-in-out infinite, glow-pulse 3s ease-in-out infinite' }}
+            className="mx-auto mb-6 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/25 ring-1 ring-white/15"
+            style={{ animation: 'float 6s ease-in-out infinite' }}
           >
-            JS
+            <Image
+              src={site.logo}
+              alt="JsCreatives"
+              width={150}
+              height={150}
+              priority
+              unoptimized
+              className="h-full w-full object-cover"
+            />
           </div>
 
           {step === 'phone' && (

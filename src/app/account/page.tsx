@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/layout/auth-provider";
 import { PayNowButton } from "@/components/orders/pay-now-button";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { formatPrice } from "@/lib/utils";
 
 interface OrderItem {
@@ -68,7 +69,10 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold text-white">My Account</h1>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <h1 className="text-2xl font-bold text-white">My Account</h1>
+        <LogoutButton />
+      </div>
 
       {/* User Info */}
       <div className="mt-6 rounded-xl bg-slate-800/50 border border-slate-700/50 p-6">

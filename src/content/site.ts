@@ -8,13 +8,13 @@ export const site = {
   description:
     "JsCreatives is a printing, branding and creative solutions company in Nairobi, Kenya. We help individuals, businesses, organizations and institutions bring their ideas to life through quality printing and professional branding.",
   url: process.env.NEXT_PUBLIC_APP_URL || "https://jscreatives.com",
-  phone: "+254780237794",
-  phoneDisplay: "+254 780 237 794",
-  whatsapp: "254780237794",
+  phone: "+254792232027",
+  phoneDisplay: "+254 792 232 027",
+  whatsapp: "254792232027",
   whatsappMessage:
     "Hello JsCreatives, I would like to inquire about your printing and branding services.",
   email: "hello@jscreatives.com",
-  location: "Nairobi, Kenya",
+  location: "Ramogi Hse, Nairobi, Kenya",
   locationNote: "Serving clients across Kenya and East Africa.",
   hours: [
     { days: "Monday to Friday", time: "8:00 AM to 6:00 PM" },
