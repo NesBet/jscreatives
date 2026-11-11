@@ -107,29 +107,62 @@ export async function POST(request: Request) {
       },
     })
 
-    const webhookUrl = process.env.QUOTE_WEBHOOK_URL
-    if (webhookUrl) {
-      try {
-        await callN8n(webhookUrl, {
-          id: quote.id,
-          fullName: data.fullName,
-          companyName: data.companyName || null,
-          phone: data.phone,
-          email: data.email,
-          service: data.service,
-          productName: data.productName || null,
-          quantity: data.quantity,
-          preferredColor: data.preferredColor || null,
-          description: data.description,
-          preferredDeliveryDate: data.preferredDeliveryDate || null,
-          additionalInstructions: data.additionalInstructions || null,
-          artworkName,
-          artworkType,
-          artworkSize,
-        })
-      } catch (error) {
-        console.error('Quote webhook failed:', error)
+    const message = [
+      `Quote request from ${data.fullName}${data.companyName ? ` (${data.companyName})` : ''}.`,
+      `Service: ${data.service}`,
+      data.productName ? `Product: ${data.productName}` : null,
+      `Quantity: ${data.quantity}`,
+      data.preferredColor ? `Preferred colour: ${data.preferredColor}` : null,
+      data.preferredDeliveryDate ? `Preferred delivery: ${data.preferredDeliveryDate}` : null,
+      '',
+      data.description,
+      data.additionalInstructions ? `Additional instructions: ${data.additionalInstructions}` : null,
+      artworkName ? `Artwork: ${artworkName}` : null,
+    ].filter((line): line is string => line !== null).join('\n')
+
+    const webhookUrls = Array.from(
+      new Set(
+        [process.env.CONTACT_WEBHOOK_URL, process.env.QUOTE_WEBHOOK_URL].filter(
+          (url): url is string => Boolean(url)
+        )
+      )
+    )
+
+    if (webhookUrls.length > 0) {
+      const payload = {
+        type: 'quote_request',
+        subject: `New quote request from ${data.fullName}`,
+        id: quote.id,
+        name: data.fullName,
+        fullName: data.fullName,
+        company: data.companyName || null,
+        companyName: data.companyName || null,
+        phone: data.phone,
+        email: data.email,
+        service: data.service,
+        productName: data.productName || null,
+        quantity: data.quantity,
+        preferredColor: data.preferredColor || null,
+        description: data.description,
+        message,
+        preferredDeliveryDate: data.preferredDeliveryDate || null,
+        additionalInstructions: data.additionalInstructions || null,
+        artworkName,
+        artworkType,
+        artworkSize,
       }
+
+      const results = await Promise.allSettled(
+        webhookUrls.map((url) => callN8n(url, payload))
+      )
+
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          console.error('Quote webhook failed:', result.reason)
+        } else if (!result.value.ok) {
+          console.error(`Quote webhook returned HTTP ${result.value.status}.`)
+        }
+      })
     }
 
     return Response.json(
