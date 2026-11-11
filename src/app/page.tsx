@@ -114,7 +114,7 @@ export default function HomePage() {
               />
             </div>
             <h1 className="display-hero relative z-10 text-ink">
-              <span className="block">Your brand.</span>
+              <span className="block">Your brand,</span>
               <span className="block text-transparent [-webkit-text-stroke:1.5px_var(--color-brand-red)]">
                 Our creativity.
               </span>
