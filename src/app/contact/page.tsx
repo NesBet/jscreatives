@@ -1,193 +1,206 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/toast";
-import { contactSchema } from "@/lib/validations";
-import { cn } from "@/lib/utils";
+import { ArrowUpRight, Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { PageHero } from "@/components/site/page-hero";
+import { ContactForm } from "@/components/site/contact-form";
+import { Reveal } from "@/components/ui/reveal";
+import { site, socialLinks, whatsappUrl } from "@/content/site";
+import { socialIconMap } from "@/components/site/social-icons";
 
-type FormState = {
-  name: string;
-  email: string;
-  whatsapp: string;
-  message: string;
-};
-
-const initialForm: FormState = {
-  name: "",
-  email: "",
-  whatsapp: "",
-  message: "",
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description:
+    "Contact JsCreatives in Nairobi for printing, branding, customized merchandise, promotional products and event branding. Call, WhatsApp or send an enquiry.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
-  const { toast } = useToast();
-  const [form, setForm] = useState<FormState>(initialForm);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name as keyof FormState]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrors({});
-
-    const parsed = contactSchema.safeParse(form);
-    if (!parsed.success) {
-      const fieldErrors: Partial<Record<keyof FormState, string>> = {};
-      for (const issue of parsed.error.issues) {
-        const key = issue.path[0] as keyof FormState;
-        if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
-      }
-      setErrors(fieldErrors);
-      toast("error", "Please fix the highlighted fields.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast("error", data?.error || "Something went wrong. Please try again.");
-        return;
-      }
-
-      toast("success", data?.message || "Your message has been sent successfully.");
-      setForm(initialForm);
-    } catch {
-      toast("error", "Network error. Please check your connection and try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-24 lg:py-32">
-        <header className="max-w-3xl animate-fade-in-up">
-          <p className="text-sm font-semibold uppercase tracking-wider text-red-500">Get In Touch</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-[var(--font-display)]">
-            Contact <span className="gradient-text">Us</span>
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            Planning a rebrand, a merchandise drop or a print run? Tell us what you have in mind
-            and our studio will get back to you with a clear next step.
+    <>
+      <PageHero
+        eyebrow="Contact us"
+        title={
+          <>
+            Tell us what you are
+            <br />
+            <span className="text-gold-deep">making.</span>
+          </>
+        }
+        description={
+          <p>
+            A product list, a deadline, a rough idea or a file you need printed.
+            Send it through and we will come back with a clear next step.
           </p>
-        </header>
+        }
+      >
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex items-center justify-center gap-3 bg-ink px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-gold hover:text-ink"
+        >
+          Chat on WhatsApp
+          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </a>
+        <a
+          href={`tel:${site.phone}`}
+          className="inline-flex items-center justify-center gap-3 border border-ink/25 px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper"
+        >
+          Call the studio
+        </a>
+      </PageHero>
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
-          <div className="double-bezel rounded-2xl p-2 animate-fade-in-up">
-            <div className="double-bezel-inner rounded-2xl bg-[var(--color-bg-card)]/80 p-6 sm:p-8">
-              <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <Input
-                    label="Your Name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    error={errors.name}
-                    placeholder="Jane Doe"
-                    autoComplete="name"
-                  />
-                  <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    error={errors.email}
-                    placeholder="jane@example.com"
-                    autoComplete="email"
-                  />
-                </div>
-                <Input
-                  label="WhatsApp Number"
-                  name="whatsapp"
-                  type="tel"
-                  value={form.whatsapp}
-                  onChange={handleChange}
-                  error={errors.whatsapp}
-                  placeholder="+254 7XX XXX XXX"
-                  autoComplete="tel"
-                />
-                <Textarea
-                  label="Message"
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  error={errors.message}
-                  placeholder="Tell us about your brand, quantities and deadline..."
-                  rows={5}
-                />
-                <div>
-                  <Button type="submit" loading={loading} size="lg">
-                    Send Message
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
+      <section className="py-16 lg:py-24">
+        <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-4">
+            <p className="eyebrow">Studio details</p>
+            <h2 className="display-subtitle mt-5 text-ink">
+              Reach us the way
+              <br />
+              that suits <span className="text-gold-deep">you.</span>
+            </h2>
 
-          <aside className="space-y-6 animate-fade-in-up">
-            <div className="double-bezel rounded-2xl p-6">
-              <h3 className="text-lg font-semibold text-white font-[var(--font-display)]">Reach Us Directly</h3>
-              <ul className="mt-4 space-y-4 text-sm text-slate-400">
-                <li className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span>We reply to every project enquiry within one business day.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  <span>WhatsApp is best for quick questions and order updates.</span>
-                </li>
-              </ul>
-            </div>
-            <div className={cn("rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 p-6")}>
-              <p className="text-sm text-slate-400">
-                Prefer to browse? Our shop has apparel, bags, drinkware, stationery, signage
-                and packaging ready to brand.
-              </p>
-              <Link
-                href="/catalog"
-                className="mt-4 inline-block text-sm font-medium text-red-500 transition-colors hover:text-red-400"
+            <div className="mt-8 space-y-6 border-t border-line pt-6">
+              <a href={`tel:${site.phone}`} className="group flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line text-gold-deep">
+                  <Phone className="h-4 w-4" strokeWidth={1.5} />
+                </span>
+                <span>
+                  <span className="block text-[9.5px] font-semibold uppercase tracking-[0.17em] text-stone">
+                    Call us
+                  </span>
+                  <span className="mt-1 block text-[14px] text-ink transition-colors group-hover:text-gold-deep">
+                    {site.phoneDisplay}
+                  </span>
+                </span>
+              </a>
+
+              <a href={`mailto:${site.email}`} className="group flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line text-gold-deep">
+                  <Mail className="h-4 w-4" strokeWidth={1.5} />
+                </span>
+                <span>
+                  <span className="block text-[9.5px] font-semibold uppercase tracking-[0.17em] text-stone">
+                    Email us
+                  </span>
+                  <span className="mt-1 block break-all text-[14px] text-ink transition-colors group-hover:text-gold-deep">
+                    {site.email}
+                  </span>
+                </span>
+              </a>
+
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4"
               >
-                Go to Catalog &rarr;
-              </Link>
-            </div>
-          </aside>
-        </div>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line text-gold-deep">
+                  <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+                </span>
+                <span>
+                  <span className="block text-[9.5px] font-semibold uppercase tracking-[0.17em] text-stone">
+                    WhatsApp
+                  </span>
+                  <span className="mt-1 block text-[14px] text-ink transition-colors group-hover:text-gold-deep">
+                    Chat with us
+                  </span>
+                </span>
+              </a>
 
-        <div className="mt-12 text-center">
-          <Link href="/" className="text-sm text-slate-500 transition-colors hover:text-white">
-            &larr; Back to Home
-          </Link>
+              <div className="flex items-start gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-line text-gold-deep">
+                  <MapPin className="h-4 w-4" strokeWidth={1.5} />
+                </span>
+                <span>
+                  <span className="block text-[9.5px] font-semibold uppercase tracking-[0.17em] text-stone">
+                    Find us
+                  </span>
+                  <span className="mt-1 block text-[14px] text-ink">{site.location}</span>
+                  <span className="mt-1 block text-[11px] text-stone">{site.locationNote}</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-8 border-t border-line pt-6">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-gold-deep" strokeWidth={1.5} />
+                <h3 className="text-[9.5px] font-semibold uppercase tracking-[0.17em] text-ink">
+                  Studio hours
+                </h3>
+              </div>
+              <dl className="mt-4 space-y-2">
+                {site.hours.map((entry) => (
+                  <div key={entry.days} className="flex items-baseline justify-between gap-4 border-b border-line/70 pb-2 text-[12px]">
+                    <dt className="text-stone">{entry.days}</dt>
+                    <dd className="font-medium text-ink">{entry.time}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <div className="mt-8">
+              <p className="text-[9.5px] font-semibold uppercase tracking-[0.17em] text-stone">
+                Follow the studio
+              </p>
+              <div className="mt-3 flex gap-2.5">
+                {socialLinks.map((social) => {
+                  const Icon = socialIconMap[social.label as keyof typeof socialIconMap];
+                  return (
+                    <Link
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`JsCreatives on ${social.label}`}
+                      className="flex h-10 w-10 items-center justify-center border border-line text-stone transition-colors hover:border-ink hover:text-ink"
+                    >
+                      {Icon ? <Icon className="h-4 w-4" /> : social.label.charAt(0)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal className="lg:col-span-8" delay={100}>
+            <div className="flex items-end justify-between gap-6">
+              <div>
+                <p className="eyebrow">Send a message</p>
+                <h2 className="mt-4 font-display text-[clamp(1.6rem,2.6vw,2.3rem)] font-medium tracking-[-0.035em] text-ink">
+                  We usually reply within one business day.
+                </h2>
+              </div>
+            </div>
+            <div className="mt-7">
+              <ContactForm />
+            </div>
+          </Reveal>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section className="relative overflow-hidden border-t border-line bg-ink py-16 text-paper lg:py-20">
+        <div className="pointer-events-none absolute inset-0 grain-layer opacity-[0.05]" aria-hidden="true" />
+        <div className="container-wide relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+          <div>
+            <p className="eyebrow text-gold-soft">Faster response</p>
+            <h2 className="display-subtitle mt-5 max-w-2xl text-paper">
+              Send a photo, a file or a voice note.
+              <br />
+              We will tell you what is <span className="text-gold-soft">possible.</span>
+            </h2>
+          </div>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-4 bg-gold px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-paper"
+          >
+            Open WhatsApp
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </a>
+        </div>
+      </section>
+    </>
   );
 }

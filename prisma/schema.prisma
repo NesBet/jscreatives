@@ -23,6 +23,13 @@ enum ProductCategory {
   STATIONERY
   SIGNAGE
   PACKAGING
+  APPAREL_CLOTHING
+  OFFICE_STATIONERY
+  PROMOTIONAL_MERCHANDISE
+  BAGS_ACCESSORIES
+  MARKETING_MATERIALS
+  EVENT_BRANDING
+  PERSONALIZED_GIFTS
 
   @@map("product_category")
 }
@@ -135,13 +142,15 @@ model Product {
   description String          @db.Text
   category    ProductCategory
   printMethod PrintMethod
-  material    String
-  turnaround  String
-  basePrice   Decimal         @db.Decimal(10, 2)
-  active      Boolean         @default(true)
-  featured    Boolean         @default(false)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  material      String
+  turnaround    String
+  basePrice     Decimal         @db.Decimal(10, 2)
+  colors        String[]        @default([])
+  customization String[]        @default([])
+  active        Boolean         @default(true)
+  featured      Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   images    ProductImage[]
   variants  ProductVariant[]
@@ -309,6 +318,73 @@ model Payment {
   @@index([reference])
   @@index([orderId])
   @@map("payments")
+}
+
+// ─── Contact Messages ─────────────────────────────────────────────────────────
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+  CLOSED
+
+  @@map("contact_status")
+}
+
+model ContactMessage {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  service   String?
+  message   String        @db.Text
+  status    ContactStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
+}
+
+// ─── Quote Requests ───────────────────────────────────────────────────────────
+
+enum QuoteStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  WON
+  CLOSED
+
+  @@map("quote_status")
+}
+
+model QuoteRequest {
+  id                        String      @id @default(cuid())
+  fullName                  String
+  companyName               String?
+  phone                     String
+  email                     String
+  service                   String
+  productName               String?
+  quantity                  Int
+  preferredColor            String?
+  description               String      @db.Text
+  preferredDeliveryDate     String?
+  additionalInstructions    String?     @db.Text
+  artworkName               String?
+  artworkType               String?
+  artworkSize               Int?
+  artworkData               String?     @db.Text
+  status                    QuoteStatus @default(NEW)
+  internalNotes             String?     @db.Text
+  createdAt                 DateTime    @default(now())
+  updatedAt                 DateTime    @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("quote_requests")
 }
 
 // ─── Audit Log ────────────────────────────────────────────────────────────────

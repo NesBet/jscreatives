@@ -1,281 +1,234 @@
 "use client";
 
-import { useState, useLayoutEffect, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Mail, MapPin, Menu, Phone, X } from "lucide-react";
+import { Logo } from "@/components/layout/logo";
 import { useAuth } from "@/components/layout/auth-provider";
-import { useCart } from "@/components/layout/cart-provider";
-import { MagneticButton } from "@/components/ui/MagneticButton";
-
-const navLinks = [
-  { href: "/catalog", label: "Shop" },
-  { href: "/#work", label: "Work" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
-
-interface MenuItemProps {
-  href: string;
-  label: string;
-  onClose: () => void;
-}
-
-function MenuLink({ href, label, onClose }: MenuItemProps) {
-  return (
-    <Link
-      href={href}
-      onClick={onClose}
-      className="block px-4 py-3 text-sm text-slate-300 transition-colors hover:bg-slate-800/50 hover:text-white"
-    >
-      {label}
-    </Link>
-  );
-}
-
-function UserMenu({ user, onLogout }: { user: { name: string; email: string; role: string }; onLogout: () => void }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const isAdmin = user.role === "ADMIN";
-
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-slate-300 transition-all duration-300 ease-[var(--ease-smooth)] hover:bg-slate-800/50 hover:text-white"
-        aria-haspopup="menu"
-        aria-expanded={open}
-      >
-        <span className="truncate max-w-[140px]">{user.name}</span>
-        <svg
-          className={`h-4 w-4 transition-transform duration-300 ease-[var(--ease-spring)] ${open ? "rotate-180" : ""}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/95 backdrop-blur-2xl py-2 shadow-[var(--shadow-elevated)] animate-fade-in-down"
-        >
-          <div className="border-b border-slate-800 px-4 py-3">
-            <p className="truncate text-sm font-medium text-white">{user.name}</p>
-            <p className="truncate text-xs text-slate-500">{user.email}</p>
-          </div>
-
-          {isAdmin && (
-            <>
-              <p className="px-4 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-slate-600">
-                Admin
-              </p>
-              <MenuLink href="/admin" label="Dashboard" onClose={() => setOpen(false)} />
-              <MenuLink href="/admin/products" label="Products" onClose={() => setOpen(false)} />
-              <MenuLink href="/admin/orders" label="Orders" onClose={() => setOpen(false)} />
-              <MenuLink href="/admin/users" label="Users" onClose={() => setOpen(false)} />
-              <MenuLink href="/admin/payments" label="Payments" onClose={() => setOpen(false)} />
-              <MenuLink href="/admin/audit" label="Audit Logs" onClose={() => setOpen(false)} />
-              <div className="my-2 border-t border-slate-800" />
-            </>
-          )}
-
-          <MenuLink href="/account" label={isAdmin ? "My Store Account" : "My Account"} onClose={() => setOpen(false)} />
-
-          <button
-            onClick={() => {
-              setOpen(false);
-              onLogout();
-            }}
-            className="block w-full px-4 py-3 text-left text-sm text-red-400 transition-colors hover:bg-slate-800/50 hover:text-red-300"
-            role="menuitem"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+import { navLinks, site, whatsappUrl } from "@/content/site";
+import { cn } from "@/lib/utils";
 
 export function Header() {
-  const { user, setUser } = useAuth();
-  const { cartCount } = useCart();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [cartBump, setCartBump] = useState(false);
+  const pathname = usePathname();
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const prevCountRef = useRef(cartCount);
-  const bumpTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useLayoutEffect(() => {
-    if (cartCount !== prevCountRef.current) {
-      prevCountRef.current = cartCount;
-      if (bumpTimerRef.current) clearTimeout(bumpTimerRef.current);
-      setCartBump(true);
-      bumpTimerRef.current = setTimeout(() => setCartBump(false), 300);
-      return () => {
-        if (bumpTimerRef.current) clearTimeout(bumpTimerRef.current);
-      }
-    }
-  }, [cartCount]);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-  };
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const accountHref = user?.role === "ADMIN" ? "/admin" : user ? "/account" : "/login";
+  const accountLabel = user?.role === "ADMIN" ? "Admin" : user ? "My account" : "Client login";
 
   return (
-    <header className={`sticky top-4 z-50 w-full transition-all duration-500 ease-[var(--ease-smooth)] ${scrolled ? "top-2" : "top-4"}`}>
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="relative z-10 flex items-center gap-2 text-xl font-bold tracking-tight text-white transition-colors duration-300 hover:text-red-500"
-          aria-label="JSCREATIVES Home"
+    <>
+      <header
+        className={cn(
+          "sticky top-0 z-50 w-full border-b bg-paper/92 backdrop-blur-md transition-shadow duration-500",
+          scrolled ? "border-line shadow-[0_8px_30px_-24px_rgba(23,22,20,0.5)]" : "border-transparent"
+        )}
+      >
+        <div
+          className={cn(
+            "overflow-hidden bg-ink text-paper transition-all duration-500",
+            scrolled ? "max-h-0 opacity-0" : "max-h-12 opacity-100"
+          )}
         >
-          <span className="relative z-10">JS</span>
-          <span className="text-red-600 relative z-10">CREATIVES</span>
-        </Link>
-
-        {/* Floating Glass Pill Navigation */}
-        <nav className="relative z-10 hidden md:flex items-center" aria-label="Main navigation">
-          <div className="glass-strong rounded-full px-6 py-2 flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="relative px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 ease-[var(--ease-smooth)] hover:text-white hover:bg-white/5 rounded-full"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        {/* Right section */}
-        <div className="flex items-center gap-3">
-          {/* Cart */}
-          <Link
-            href="/cart"
-            className="relative p-2 text-slate-300 transition-all duration-300 hover:bg-white/5 hover:text-white rounded-full group"
-            aria-label={`Cart with ${cartCount} items`}
-          >
-            <svg className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-            </svg>
-            {cartCount > 0 && (
-              <span className={`absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent)] text-[10px] font-bold text-white transition-all duration-300 ease-[var(--ease-spring)] ${cartBump ? "scale-125" : "scale-100"}`}>
-                {cartCount > 99 ? "99+" : cartCount}
+          <div className="container-wide flex h-9 items-center justify-between text-[10px] font-medium uppercase tracking-[0.16em] text-paper/65">
+            <div className="flex items-center gap-5">
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="h-3 w-3 text-gold-soft" strokeWidth={1.6} />
+                {site.location}
               </span>
-            )}
-          </Link>
-
-          {/* Auth buttons - desktop */}
-          <div className="hidden items-center gap-2 md:flex">
-            {user ? (
-              <UserMenu user={user} onLogout={handleLogout} />
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:text-white rounded-full"
-                >
-                  Login
-                </Link>
-                <MagneticButton variant="primary" size="sm" href="/register">
-                  Register
-                </MagneticButton>
-              </div>
-            )}
+              <span className="hidden items-center gap-1.5 sm:inline-flex">
+                <span className="h-1 w-1 rounded-full bg-gold-soft/70" />
+                Mon–Fri, 8am–6pm
+              </span>
+            </div>
+            <div className="flex items-center gap-5">
+              <a
+                href={`mailto:${site.email}`}
+                className="hidden items-center gap-1.5 transition-colors hover:text-paper sm:inline-flex"
+              >
+                <Mail className="h-3 w-3 text-gold-soft" strokeWidth={1.6} />
+                {site.email}
+              </a>
+              <a
+                href={`tel:${site.phone}`}
+                className="inline-flex items-center gap-1.5 transition-colors hover:text-paper"
+              >
+                <Phone className="h-3 w-3 text-gold-soft" strokeWidth={1.6} />
+                {site.phoneDisplay}
+              </a>
+              <Link
+                href={accountHref}
+                className="hidden items-center gap-1 transition-colors hover:text-paper md:inline-flex"
+              >
+                {accountLabel}
+                <ArrowUpRight className="h-3 w-3" strokeWidth={1.6} />
+              </Link>
+            </div>
           </div>
+        </div>
 
-          {/* Mobile menu button */}
+        <div className="container-wide flex h-[74px] items-center justify-between gap-6">
+          <Logo />
+
+          <nav aria-label="Main navigation" className="hidden items-center gap-6 lg:flex xl:gap-8">
+            {navLinks.map((link) => {
+              const active =
+                link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "relative py-2 text-[12px] font-medium tracking-[0.03em] transition-colors",
+                    active ? "text-ink" : "text-stone hover:text-ink"
+                  )}
+                >
+                  {link.label}
+                  <span
+                    className={cn(
+                      "absolute -bottom-0.5 left-0 h-px w-full origin-left bg-gold transition-transform duration-300",
+                      active ? "scale-x-100" : "scale-x-0"
+                    )}
+                  />
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden h-10 w-10 items-center justify-center border border-line text-stone transition-colors hover:border-ink hover:text-ink sm:flex"
+              aria-label="Chat with JsCreatives on WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.61.13-.14.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.35 5.1 4.56.71.3 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.08 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z" />
+                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.26.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Z" />
+              </svg>
+            </Link>
+            <Link
+              href="/quote"
+              className="group inline-flex h-10 items-center gap-2.5 bg-ink px-4 text-[11px] font-semibold uppercase tracking-[0.13em] text-paper transition-colors hover:bg-gold hover:text-ink sm:px-5"
+            >
+              Get a quote
+              <ArrowUpRight
+                className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                strokeWidth={1.7}
+              />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center border border-line text-ink transition-colors hover:border-ink lg:hidden"
+              aria-label="Open menu"
+              aria-expanded={open}
+              aria-controls="mobile-navigation"
+            >
+              <Menu className="h-5 w-5" strokeWidth={1.6} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        id="mobile-navigation"
+        className={cn(
+          "fixed inset-0 z-[70] bg-paper transition-all duration-500 lg:hidden",
+          open ? "visible opacity-100" : "invisible opacity-0"
+        )}
+        aria-hidden={!open}
+      >
+        <div className="container-wide flex h-[74px] items-center justify-between border-b border-line">
+          <Logo />
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 text-slate-300 transition-all duration-300 hover:bg-white/5 hover:text-white rounded-full md:hidden"
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
+            type="button"
+            onClick={() => setOpen(false)}
+            className="inline-flex h-10 w-10 items-center justify-center border border-line text-ink"
+            aria-label="Close menu"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            <X className="h-5 w-5" strokeWidth={1.6} />
           </button>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden animate-fade-in-down border-t border-slate-800 bg-slate-950/95 backdrop-blur-2xl">
-          <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Mobile navigation">
-            {navLinks.map((link) => (
+        <div className="container-wide flex h-[calc(100dvh-74px)] flex-col overflow-y-auto py-8">
+          <nav aria-label="Mobile navigation" className="flex flex-col">
+            {navLinks.map((link, index) => (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="px-4 py-3 text-base font-medium text-slate-300 transition-colors hover:bg-white/5 hover:text-white rounded-xl"
+                onClick={() => setOpen(false)}
+                className="group flex items-baseline justify-between border-b border-line py-4"
               >
-                {link.label}
+                <span className="flex items-baseline gap-4">
+                  <span className="text-[10px] font-semibold tracking-[0.18em] text-gold">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-display text-[27px] font-medium tracking-[-0.04em] text-ink transition-colors group-hover:text-gold-deep">
+                    {link.label}
+                  </span>
+                </span>
+                <ArrowUpRight className="h-4 w-4 text-stone transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </Link>
             ))}
-            {user ? (
-              <>
-                <div className="px-4 py-3 border-b border-slate-800">
-                  <p className="text-sm font-medium text-white">{user.name}</p>
-                  <p className="text-xs text-slate-500">{user.email}</p>
-                </div>
-                {user.role === "ADMIN" && (
-                  <>
-                    <p className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-slate-600">Admin</p>
-                    <Link href="/admin" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Dashboard</Link>
-                    <Link href="/admin/products" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Products</Link>
-                    <Link href="/admin/orders" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Orders</Link>
-                    <Link href="/admin/users" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Users</Link>
-                    <Link href="/admin/payments" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Payments</Link>
-                    <Link href="/admin/audit" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Audit Logs</Link>
-                    <div className="my-2 border-t border-slate-800" />
-                  </>
-                )}
-                <Link href="/account" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">My Account</Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileOpen(false);
-                  }}
-                  className="mx-4 mt-2 px-4 py-3 text-base font-medium text-red-400 transition-colors hover:bg-white/5 hover:text-red-300 rounded-xl text-left"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-base text-slate-300 hover:bg-white/5 hover:text-white rounded-xl">Login</Link>
-                <MagneticButton variant="primary" size="md" className="mx-4 mt-2 w-full" href="/register">
-                  Register
-                </MagneticButton>
-              </>
-            )}
           </nav>
+
+          <Link
+            href="/quote"
+            onClick={() => setOpen(false)}
+            className="mt-8 flex h-14 items-center justify-center gap-3 bg-ink text-[12px] font-semibold uppercase tracking-[0.16em] text-paper"
+          >
+            Request a free quote
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+
+          <div className="mt-auto grid gap-3 pt-10 text-sm text-stone sm:grid-cols-2">
+            <a href={`tel:${site.phone}`} className="inline-flex items-center gap-2 hover:text-ink">
+              <Phone className="h-4 w-4 text-gold" strokeWidth={1.6} />
+              {site.phoneDisplay}
+            </a>
+            <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2 hover:text-ink">
+              <Mail className="h-4 w-4 text-gold" strokeWidth={1.6} />
+              {site.email}
+            </a>
+            <span className="inline-flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-gold" strokeWidth={1.6} />
+              {site.location}
+            </span>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 hover:text-ink"
+            >
+              <span className="h-4 w-4 text-center text-gold">↗</span>
+              WhatsApp us
+            </a>
+          </div>
         </div>
-      )}
-    </header>
+      </div>
+    </>
   );
 }

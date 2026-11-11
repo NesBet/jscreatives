@@ -45,7 +45,9 @@ export const productSchema = z.object({
   printMethod: z.enum(PRINT_METHODS),
   material: z.string().min(1, 'Material is required'),
   turnaround: z.string().min(1, 'Turnaround is required'),
-  basePrice: z.number().positive('Price must be positive'),
+  basePrice: z.number().min(0, 'Price must be zero or positive'),
+  colors: z.array(z.string()).optional(),
+  customization: z.array(z.string()).optional(),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   variants: z
@@ -100,14 +102,50 @@ export const orderStatusSchema = z.object({
 })
 
 export const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  whatsapp: z
+  name: z.string().min(2, 'Name must be at least 2 characters').max(120),
+  email: z.string().email('Invalid email address').max(160),
+  phone: z
     .string()
-    .min(7, 'Enter a valid WhatsApp number')
-    .regex(/^[0-9+\s-]+$/, 'WhatsApp number can only contain digits, spaces, + and -'),
+    .min(7, 'Enter a valid phone number')
+    .max(24)
+    .regex(/^[0-9+\s()-]+$/, 'Phone number can only contain digits, spaces, +, - and brackets')
+    .optional()
+    .or(z.literal('')),
+  company: z.string().max(160).optional().or(z.literal('')),
+  service: z.string().max(120).optional().or(z.literal('')),
   message: z
     .string()
     .min(10, 'Message must be at least 10 characters')
     .max(2000, 'Message must be 2000 characters or less'),
+  website: z.string().max(0).optional().or(z.literal('')),
+})
+
+export const quoteSchema = z.object({
+  fullName: z.string().min(2, 'Full name is required').max(120),
+  companyName: z.string().max(160).optional().or(z.literal('')),
+  phone: z
+    .string()
+    .min(7, 'Enter a valid phone number')
+    .max(24)
+    .regex(/^[0-9+\s()-]+$/, 'Phone number can only contain digits, spaces, +, - and brackets'),
+  email: z.string().email('Invalid email address').max(160),
+  service: z.string().min(2, 'Select a service').max(120),
+  productName: z.string().max(160).optional().or(z.literal('')),
+  quantity: z.coerce
+    .number()
+    .int('Quantity must be a whole number')
+    .min(1, 'Quantity must be at least 1')
+    .max(1000000, 'Quantity is too large'),
+  preferredColor: z.string().max(160).optional().or(z.literal('')),
+  description: z
+    .string()
+    .min(10, 'Describe what you need in at least 10 characters')
+    .max(5000, 'Description must be 5000 characters or less'),
+  preferredDeliveryDate: z.string().max(40).optional().or(z.literal('')),
+  additionalInstructions: z
+    .string()
+    .max(2000, 'Additional instructions must be 2000 characters or less')
+    .optional()
+    .or(z.literal('')),
+  website: z.string().max(0).optional().or(z.literal('')),
 })

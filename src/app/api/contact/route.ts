@@ -1,74 +1,86 @@
+import { prisma } from '@/lib/prisma'
 import { contactSchema } from '@/lib/validations'
+import { rateLimit } from '@/lib/rate-limit'
+import { callN8n } from '@/lib/n8n'
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  )
+}
 
 export async function POST(request: Request) {
   try {
+    const rate = rateLimit(`contact:${getClientIp(request)}`, 5, 10 * 60 * 1000)
+    if (!rate.success) {
+      return Response.json(
+        { error: 'Too many messages. Please try again in a few minutes.' },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
     const parsed = contactSchema.safeParse(body)
+
     if (!parsed.success) {
       return Response.json(
-        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { error: 'Please check the highlighted fields.', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       )
     }
 
-    const webhookUrl = process.env.CONTACT_WEBHOOK_URL
-    if (!webhookUrl) {
-      console.error('CONTACT_WEBHOOK_URL is not configured')
-      return Response.json({ error: 'Contact service is unavailable.' }, { status: 503 })
-    }
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 15000)
-
-    const contactSecret = process.env.N8N_CONTACT_SECRET
-
-    let webhookResponse: Response
-    try {
-      webhookResponse = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(contactSecret ? { N8N_CONTACT_SECRET: contactSecret } : {}),
-        },
-        body: JSON.stringify(parsed.data),
-        signal: controller.signal,
+    if (parsed.data.website) {
+      return Response.json({
+        success: true,
+        message: 'Thank you. We will get back to you shortly.',
       })
-    } catch (err) {
-      clearTimeout(timeout)
-      console.error('Contact webhook request failed:', err)
-      return Response.json(
-        { error: 'Unable to reach the contact service. Please try again later.' },
-        { status: 502 }
-      )
-    }
-    clearTimeout(timeout)
-
-    let data: unknown = null
-    try {
-      data = await webhookResponse.json()
-    } catch {
-      data = null
     }
 
-    if (!webhookResponse.ok) {
-      return Response.json(
-        { error: 'The contact service returned an error. Please try again later.' },
-        { status: 502 }
-      )
+    const { name, email, phone, company, service, message } = parsed.data
+
+    const saved = await prisma.contactMessage.create({
+      data: {
+        name,
+        email,
+        phone: phone || null,
+        company: company || null,
+        service: service || null,
+        message,
+      },
+    })
+
+    const webhookUrl = process.env.CONTACT_WEBHOOK_URL
+    if (webhookUrl) {
+      try {
+        await callN8n(webhookUrl, {
+          id: saved.id,
+          name,
+          email,
+          phone: phone || null,
+          company: company || null,
+          service: service || null,
+          message,
+        })
+      } catch (error) {
+        console.error('Contact webhook failed:', error)
+      }
     }
 
-    const webhookMessage =
-      data && typeof data === 'object' && 'message' in data
-        ? (data as { message?: unknown }).message
-        : undefined
-    const message =
-      typeof webhookMessage === 'string'
-        ? webhookMessage
-        : 'Your message has been sent successfully. We will get back to you shortly.'
-
-    return Response.json({ success: true, message }, { status: 200 })
+    return Response.json(
+      {
+        success: true,
+        message:
+          'Your message has been received. Our team will get back to you within one business day.',
+      },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Contact route error:', error)
-    return Response.json({ error: 'Internal server error' }, { status: 500 })
+    return Response.json(
+      { error: 'We could not send your message right now. Please try again.' },
+      { status: 500 }
+    )
   }
 }

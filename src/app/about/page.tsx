@@ -1,138 +1,291 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { DoubleBezelCard } from "@/components/ui/DoubleBezelCard";
-import { MagneticButton } from "@/components/ui/MagneticButton";
+import { ArrowUpRight, Compass, Eye } from "lucide-react";
+import { PageHero } from "@/components/site/page-hero";
+import { SiteButton } from "@/components/ui/site-button";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Reveal } from "@/components/ui/reveal";
+import { coreValues, site, whyChoose } from "@/content/site";
 
-export const metadata = {
-  title: "About JSCREATIVES - Branding & Print Studio Kenya",
+export const metadata: Metadata = {
+  title: "About Us",
   description:
-    "JSCREATIVES is a Nairobi branding and print studio creating identities, apparel, packaging and signage for brands across Kenya.",
+    "Meet JsCreatives, a Nairobi printing and branding studio helping individuals, businesses, organizations and institutions bring their ideas to life.",
+  alternates: { canonical: "/about" },
 };
-
-const values = [
-  {
-    title: "Design-led",
-    description:
-      "Every project starts with the brand idea, not the product. We design the system before we choose the material.",
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Built in-house",
-    description:
-      "Printing, embroidery, cutting and finishing happen under one roof, so colour and quality stay consistent.",
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Reliable delivery",
-    description:
-      "Clear timelines, digital proofs and tracked delivery across Kenya. No surprises between approval and arrival.",
-    icon: (
-      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-      </svg>
-    ),
-  },
-];
-
-const stats = [
-  { value: "7", label: "Product categories" },
-  { value: "1", label: "Studio, end to end" },
-  { value: "100%", label: "Artwork checked" },
-  { value: "2-5", label: "Day delivery" },
-];
 
 export default function AboutPage() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-red-600/5 blur-3xl" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:py-32">
-        <header className="max-w-3xl animate-fade-in-up">
-          <p className="text-sm font-semibold uppercase tracking-wider text-red-500">Our Story</p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl font-[var(--font-display)]">
-            About <span className="gradient-text">JSCREATIVES</span>
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-slate-400">
-            JSCREATIVES is a branding and print studio in Nairobi. We help businesses turn an idea
-            into a complete visual identity — then produce the apparel, packaging and print that
-            carry it into the real world.
-          </p>
-        </header>
-
-        <section className="mt-16">
-          <DoubleBezelCard variant="elevated" padding="lg" className="animate-fade-in-up">
-            <h2 className="text-2xl font-semibold text-white font-[var(--font-display)]">Our Mission</h2>
-            <p className="mt-4 leading-relaxed text-slate-400">
-              To make strong branding accessible to growing businesses: considered design, honest
-              production advice and physical pieces that feel as good as they look. One studio,
-              from the first sketch to the final delivery.
+    <>
+      <PageHero
+        eyebrow="About JsCreatives"
+        title={
+          <>
+            A studio built on the belief
+            <br />
+            that brands should feel <span className="text-gold-deep">real.</span>
+          </>
+        }
+        description={
+          <>
+            <p>
+              JsCreatives is a printing, branding and creative solutions company
+              based in Nairobi, Kenya. We help people and organizations turn ideas
+              into well-designed, well-produced things they are proud to put their
+              name on.
             </p>
-          </DoubleBezelCard>
-        </section>
+            <p className="mt-4">
+              Our work sits where design meets production: identity, print,
+              merchandise, packaging and the branded environments customers
+              experience.
+            </p>
+          </>
+        }
+        image="/images/brand/work-mara-co.jpg"
+        imageAlt="Storefront branding and signage produced for Mara & Co."
+      >
+        <SiteButton href="/quote" variant="ink">
+          Start a project
+        </SiteButton>
+        <SiteButton href="/portfolio" variant="outline">
+          See our work
+        </SiteButton>
+      </PageHero>
 
-        <section className="mt-20">
-          <h2 className="text-3xl font-bold tracking-tight text-white font-[var(--font-display)]">
-            How We Work
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {values.map((value) => (
-              <DoubleBezelCard key={value.title} variant="interactive" padding="lg" className="animate-fade-in-up">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-red-600/10 text-red-500">
-                  {value.icon}
-                </div>
-                <h3 className="mt-6 text-xl font-semibold text-white font-[var(--font-display)]">
-                  {value.title}
+      <section className="paper-grain relative py-20 lg:py-28">
+        <div className="container-wide relative z-10 grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-5">
+            <p className="eyebrow">Our story</p>
+            <h2 className="display-title mt-6 text-ink">
+              Rooted in craft.
+              <br />
+              Built for <span className="text-gold-deep">impact.</span>
+            </h2>
+            <div className="mt-8 border-l border-gold/50 pl-5">
+              <p className="font-display text-lg font-normal italic leading-snug text-ink-soft">
+                &ldquo;{site.tagline}&rdquo;
+              </p>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-stone">
+                The JsCreatives promise
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal className="lg:col-span-7" delay={100}>
+            <div className="space-y-5 text-[15px] leading-[1.85] text-stone">
+              <p>
+                JsCreatives was built around a simple observation: a brand is
+                experienced through the things people touch. The shirt a team wears,
+                the card a client keeps, the packaging a customer opens, the sign
+                above a door. These are not small details. They are the brand.
+              </p>
+              <p>
+                That is why we bring creative direction, print and production
+                together under one roof. Instead of passing your project between a
+                designer, a printer and a supplier, you work with one studio that
+                understands the whole picture and stays accountable from proof to
+                delivery.
+              </p>
+              <p>
+                Our clients include businesses, startups, organizations and
+                institutions across Kenya and East Africa. Some come to us with a
+                finished logo. Others come with a rough idea on a phone note. We
+                meet both at the same place: a clear plan, a fair quotation and a
+                finished piece that feels considered.
+              </p>
+            </div>
+
+            <div className="mt-9 grid gap-5 border-t border-line pt-7 sm:grid-cols-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-gold-deep">
+                  Based in
+                </p>
+                <p className="mt-2 text-sm text-ink">{site.location}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-gold-deep">
+                  Working with
+                </p>
+                <p className="mt-2 text-sm text-ink">Businesses &amp; institutions</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.17em] text-gold-deep">
+                  Serving
+                </p>
+                <p className="mt-2 text-sm text-ink">Kenya &amp; East Africa</p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-y border-line bg-paper-deep py-20 lg:py-28">
+        <div className="container-wide">
+          <Reveal>
+            <SectionHeading
+              eyebrow="What drives us"
+              title={
+                <>
+                  A clear mission.
+                  <br />
+                  A bigger <span className="text-gold-deep">vision.</span>
+                </>
+              }
+              description="We are not here to be the loudest studio in the room. We are here to be the one clients trust with the work that represents them."
+            />
+          </Reveal>
+
+          <div className="mt-14 grid gap-6 lg:grid-cols-2">
+            <Reveal>
+              <div className="flex h-full flex-col border border-line bg-paper-light p-7 sm:p-9">
+                <span className="flex h-11 w-11 items-center justify-center border border-line text-gold-deep">
+                  <Compass className="h-5 w-5" strokeWidth={1.4} />
+                </span>
+                <h3 className="mt-6 font-display text-[26px] font-medium tracking-[-0.035em] text-ink">
+                  Our mission
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-slate-400">{value.description}</p>
-              </DoubleBezelCard>
+                <p className="mt-4 max-w-xl text-[14px] leading-[1.85] text-stone">
+                  To help individuals, businesses, organizations and institutions
+                  bring their ideas to life through quality printing, professional
+                  branding, customized merchandise and thoughtful creative
+                  solutions, delivered with consistency and care.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={100}>
+              <div className="flex h-full flex-col border border-line bg-paper-light p-7 sm:p-9">
+                <span className="flex h-11 w-11 items-center justify-center border border-line text-gold-deep">
+                  <Eye className="h-5 w-5" strokeWidth={1.4} />
+                </span>
+                <h3 className="mt-6 font-display text-[26px] font-medium tracking-[-0.035em] text-ink">
+                  Our vision
+                </h3>
+                <p className="mt-4 max-w-xl text-[14px] leading-[1.85] text-stone">
+                  To be the trusted partner brands turn to when they want to stand
+                  out, show up professionally and be remembered, across Kenya and
+                  beyond.
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 lg:py-28">
+        <div className="container-wide">
+          <Reveal>
+            <SectionHeading
+              eyebrow="Core values"
+              title={
+                <>
+                  The standards behind
+                  <br />
+                  every <span className="text-gold-deep">piece.</span>
+                </>
+              }
+              description="Six values that guide how we design, quote, produce and communicate."
+            />
+          </Reveal>
+
+          <div className="mt-14 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {coreValues.map((value, index) => (
+              <Reveal key={value.title} delay={(index % 3) * 70}>
+                <div className="flex gap-5 border-t border-line pt-5">
+                  <span className="font-display text-[12px] font-medium tracking-[0.05em] text-gold-deep">
+                    0{index + 1}
+                  </span>
+                  <div>
+                    <h3 className="font-display text-[20px] font-medium tracking-[-0.025em] text-ink">
+                      {value.title}
+                    </h3>
+                    <p className="mt-2 text-[13px] leading-relaxed text-stone">
+                      {value.description}
+                    </p>
+                  </div>
+                </div>
+              </Reveal>
             ))}
           </div>
-        </section>
-
-        <section className="mt-20 grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="double-bezel rounded-2xl p-6 text-center animate-fade-in-up"
-            >
-              <p className="text-3xl font-bold text-red-500 font-[var(--font-display)]">{stat.value}</p>
-              <p className="mt-2 text-sm text-slate-400">{stat.label}</p>
-            </div>
-          ))}
-        </section>
-
-        <section className="mt-20 flex flex-col items-center gap-6 rounded-3xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)]/60 px-6 py-14 text-center animate-fade-in-up">
-          <h2 className="text-3xl font-bold tracking-tight text-white font-[var(--font-display)]">
-            Have a launch coming up?
-          </h2>
-          <p className="max-w-xl text-slate-400">
-            Bring us the brief, the deadline and the quantity. We will help shape the rest.
-          </p>
-          <div className="mt-4 flex flex-wrap justify-center gap-4">
-            <MagneticButton size="lg" href="/contact">
-              Start a Project
-            </MagneticButton>
-            <MagneticButton variant="secondary" size="lg" href="/catalog">
-              Shop the Collection
-            </MagneticButton>
-          </div>
-        </section>
-
-        <div className="mt-12 text-center">
-          <Link href="/" className="text-sm text-slate-500 transition-colors hover:text-white">
-            &larr; Back to Home
-          </Link>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section className="border-y border-line bg-paper-deep py-20 lg:py-28">
+        <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-5">
+            <div className="relative aspect-[4/5] overflow-hidden bg-charcoal">
+              <Image
+                src="/images/brand/work-orbit-tech.jpg"
+                alt="Branded event merchandise produced for Orbit Tech"
+                fill
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                className="object-cover"
+              />
+            </div>
+          </Reveal>
+
+          <div className="lg:col-span-7">
+            <Reveal>
+              <p className="eyebrow">Why clients choose us</p>
+              <h2 className="display-title mt-6 max-w-2xl text-ink">
+                A partner who handles
+                <br />
+                the <span className="text-gold-deep">details.</span>
+              </h2>
+            </Reveal>
+
+            <div className="mt-9 divide-y divide-line border-t border-line">
+              {whyChoose.map((item, index) => (
+                <Reveal key={item.title} delay={index * 40}>
+                  <div className="grid grid-cols-[auto_1fr] gap-5 py-5">
+                    <span className="font-display text-[12px] font-medium tracking-[0.05em] text-gold-deep">
+                      0{index + 1}
+                    </span>
+                    <div>
+                      <h3 className="font-display text-[17px] font-medium tracking-[-0.02em] text-ink">
+                        {item.title}
+                      </h3>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-stone">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+
+            <Link
+              href="/how-it-works"
+              className="link-line mt-8 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink"
+            >
+              How we work
+              <ArrowUpRight className="h-3.5 w-3.5 text-gold" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 lg:py-20">
+        <div className="container-wide flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+          <div>
+            <p className="eyebrow">Work with us</p>
+            <h2 className="display-subtitle mt-5 max-w-2xl text-ink">
+              Bring us your next idea.
+              <br />
+              We will help it <span className="text-gold-deep">land.</span>
+            </h2>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <SiteButton href="/quote" variant="ink" size="lg">
+              Request a quote
+            </SiteButton>
+            <SiteButton href="/contact" variant="outline" size="lg">
+              Contact us
+            </SiteButton>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

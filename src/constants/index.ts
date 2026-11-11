@@ -1,23 +1,23 @@
 export const PRODUCT_CATEGORIES = [
-  'APPAREL',
-  'HEADWEAR',
-  'BAGS',
-  'DRINKWARE',
-  'STATIONERY',
-  'SIGNAGE',
-  'PACKAGING',
+  'APPAREL_CLOTHING',
+  'OFFICE_STATIONERY',
+  'PROMOTIONAL_MERCHANDISE',
+  'BAGS_ACCESSORIES',
+  'MARKETING_MATERIALS',
+  'EVENT_BRANDING',
+  'PERSONALIZED_GIFTS',
 ] as const
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number]
 
 export const CATEGORY_LABELS: Record<ProductCategory, string> = {
-  APPAREL: 'Apparel',
-  HEADWEAR: 'Headwear',
-  BAGS: 'Bags',
-  DRINKWARE: 'Drinkware',
-  STATIONERY: 'Stationery',
-  SIGNAGE: 'Signage',
-  PACKAGING: 'Packaging',
+  APPAREL_CLOTHING: 'Apparel & Clothing',
+  OFFICE_STATIONERY: 'Office & Corporate Stationery',
+  PROMOTIONAL_MERCHANDISE: 'Promotional Merchandise',
+  BAGS_ACCESSORIES: 'Bags & Accessories',
+  MARKETING_MATERIALS: 'Marketing & Advertising Materials',
+  EVENT_BRANDING: 'Event Branding',
+  PERSONALIZED_GIFTS: 'Personalized Gifts',
 }
 
 export const PRINT_METHODS = [
@@ -45,18 +45,25 @@ export const PRINT_METHOD_LABELS: Record<PrintMethodValue, string> = {
 }
 
 export const CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
-  APPAREL: 'T-shirts, hoodies and uniforms finished with print or embroidery.',
-  HEADWEAR: 'Caps and beanies with clean, durable brand marks.',
-  BAGS: 'Totes, backpacks and drawstring bags built for daily use.',
-  DRINKWARE: 'Mugs and bottles that keep your brand within reach.',
-  STATIONERY: 'Cards, letterheads and notebooks with an exacting finish.',
-  SIGNAGE: 'Banners, stickers and display graphics that command attention.',
-  PACKAGING: 'Mailer boxes and retail bags that make the unboxing.',
+  APPAREL_CLOTHING:
+    'T-shirts, polos, hoodies, caps and workwear finished with print or embroidery.',
+  OFFICE_STATIONERY:
+    'Business cards, letterheads, notebooks and diaries with an exacting finish.',
+  PROMOTIONAL_MERCHANDISE:
+    'Pens, lanyards, drinkware and everyday items that keep your brand within reach.',
+  BAGS_ACCESSORIES:
+    'Tote bags, non-woven bags, kraft bags and accessories built for daily use.',
+  MARKETING_MATERIALS:
+    'Banners, stickers and display graphics that make your campaign visible.',
+  EVENT_BRANDING:
+    'Backdrops, delegate kits and event displays produced for a complete brand experience.',
+  PERSONALIZED_GIFTS:
+    'Curated gift sets and personalized pieces for clients, staff and milestone moments.',
 }
 
-export const ORDER_NOTES_MAX = 1000
-
 export const PRODUCT_PER_PAGE = 12
+
+export const ORDER_NOTES_MAX = 1000
 
 export function categoryLabel(value: string): string {
   return CATEGORY_LABELS[value as ProductCategory] ?? value

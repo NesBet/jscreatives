@@ -1,59 +1,81 @@
 import Link from "next/link";
-
-const footerLinks = [
-  { href: "/catalog", label: "Shop" },
-  { href: "/#work", label: "Selected Work" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Start a Project" },
-];
-
-const socialLinks = [
-  { href: "https://instagram.com/jscreatives__/", label: "Instagram", icon: <i className="fa fa-instagram text-xl" aria-hidden="true" /> },
-  { href: "https://wa.me/254780237794?text=Hello%20JSCREATIVES%20Family%20I%20will%20like%20to%20inquire%20about", label: "WhatsApp", icon: <i className="fa fa-whatsapp text-xl" aria-hidden="true" /> },
-];
+import {
+  ArrowUpRight,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+} from "lucide-react";
+import { Logo } from "@/components/layout/logo";
+import { navLinks, site, socialLinks, whatsappUrl } from "@/content/site";
+import { services } from "@/content/services";
+import { socialIconMap } from "@/components/site/social-icons";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--color-border-default)] bg-[var(--color-bg-primary)] relative overflow-hidden">
-      <div className="absolute inset-0" aria-hidden="true">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-red-600/5 rounded-full blur-3xl" />
-      </div>
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-20 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-4">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="text-2xl font-bold tracking-tight text-white font-[var(--font-display)]">
-              JS<span className="text-red-600">CREATIVES</span>
-            </Link>
-            <p className="mt-4 text-slate-400 max-w-md leading-relaxed">
-              A Nairobi branding and print studio. Identity systems, branded apparel,
-              packaging, stationery and signage — designed and produced in-house.
+    <footer className="relative overflow-hidden bg-ink text-paper">
+      <div className="pointer-events-none absolute inset-0 grain-layer opacity-[0.05]" aria-hidden="true" />
+
+      <div className="container-wide relative z-10">
+        <div className="grid gap-10 border-b border-paper/12 py-14 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:py-20">
+          <div>
+            <p className="eyebrow text-gold-soft">Start something</p>
+            <h2 className="mt-5 max-w-3xl font-display text-[clamp(2.2rem,4.4vw,4.2rem)] font-medium leading-[0.98] tracking-[-0.045em] text-paper">
+              Let&apos;s make your brand
+              <br />
+              impossible to ignore.
+            </h2>
+          </div>
+          <div className="flex flex-col items-start gap-5 lg:items-end">
+            <p className="max-w-sm text-sm leading-relaxed text-paper/55 lg:text-right">
+              Tell us what you want to print, wear, hand out or put on a wall. We will
+              come back with a clear quote and a production plan.
             </p>
-            <div className="mt-8 flex gap-4">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 transition-all duration-300 hover:bg-red-600/10 hover:border-red-500/30 hover:text-red-400"
-                  aria-label={social.label}
-                >
-                  {social.icon}
-                </Link>
-              ))}
+            <Link
+              href="/quote"
+              className="group inline-flex items-center gap-4 bg-gold px-6 py-4 text-[12px] font-semibold uppercase tracking-[0.15em] text-ink transition-colors hover:bg-paper"
+            >
+              Request a free quote
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_0.9fr_1.05fr] lg:py-16">
+          <div>
+            <Logo invert />
+            <p className="mt-6 max-w-xs text-sm leading-relaxed text-paper/55">
+              {site.description}
+            </p>
+            <div className="mt-7 flex gap-2.5">
+              {socialLinks.map((social) => {
+                const Icon = socialIconMap[social.label as keyof typeof socialIconMap];
+                return (
+                  <Link
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`JsCreatives on ${social.label}`}
+                    className="flex h-9 w-9 items-center justify-center border border-paper/15 text-paper/55 transition-colors hover:border-gold hover:text-gold-soft"
+                  >
+                    {Icon ? <Icon className="h-4 w-4" /> : social.label.charAt(0)}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-6">Quick Links</h3>
-            <nav className="space-y-3" aria-label="Footer navigation">
-              {footerLinks.map((link) => (
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-paper/40">
+              Explore
+            </h3>
+            <nav aria-label="Footer navigation" className="mt-5 flex flex-col gap-3">
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block text-sm text-slate-400 transition-colors hover:text-white hover:translate-x-1 duration-300"
+                  className="w-fit text-sm text-paper/65 transition-colors hover:text-gold-soft"
                 >
                   {link.label}
                 </Link>
@@ -61,25 +83,73 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Support */}
           <div>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-6">Support</h3>
-            <nav className="space-y-3" aria-label="Support links">
-              <Link href="/faq" className="block text-sm text-slate-400 transition-colors hover:text-white hover:translate-x-1 duration-300">FAQ</Link>
-              <Link href="/shipping" className="block text-sm text-slate-400 transition-colors hover:text-white hover:translate-x-1 duration-300">Shipping Info</Link>
-              <Link href="/returns" className="block text-sm text-slate-400 transition-colors hover:text-white hover:translate-x-1 duration-300">Returns</Link>
-              <Link href="/contact" className="block text-sm text-slate-400 transition-colors hover:text-white hover:translate-x-1 duration-300">Contact Us</Link>
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-paper/40">
+              Services
+            </h3>
+            <nav aria-label="Service links" className="mt-5 flex flex-col gap-3">
+              {services.map((service) => (
+                <Link
+                  key={service.slug}
+                  href={`/services/${service.slug}`}
+                  className="w-fit text-sm text-paper/65 transition-colors hover:text-gold-soft"
+                >
+                  {service.shortName}
+                </Link>
+              ))}
             </nav>
+          </div>
+
+          <div>
+            <h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-paper/40">
+              Visit or call
+            </h3>
+            <div className="mt-5 flex flex-col gap-4 text-sm text-paper/65">
+              <span className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={1.5} />
+                <span>
+                  {site.location}
+                  <span className="mt-1 block text-xs text-paper/40">{site.locationNote}</span>
+                </span>
+              </span>
+              <a href={`tel:${site.phone}`} className="flex items-center gap-3 hover:text-gold-soft">
+                <Phone className="h-4 w-4 shrink-0 text-gold" strokeWidth={1.5} />
+                {site.phoneDisplay}
+              </a>
+              <a href={`mailto:${site.email}`} className="flex items-center gap-3 hover:text-gold-soft">
+                <Mail className="h-4 w-4 shrink-0 text-gold" strokeWidth={1.5} />
+                {site.email}
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 hover:text-gold-soft"
+              >
+                <MessageCircle className="h-4 w-4 shrink-0 text-gold" strokeWidth={1.5} />
+                Chat on WhatsApp
+              </a>
+            </div>
+            <div className="mt-6 space-y-1 border-t border-paper/12 pt-5 text-xs text-paper/40">
+              {site.hours.map((entry) => (
+                <p key={entry.days} className="flex justify-between gap-4">
+                  <span>{entry.days}</span>
+                  <span>{entry.time}</span>
+                </p>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="mt-16 pt-8 border-t border-[var(--color-border-default)] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500">
-            &copy; {new Date().getFullYear()} JSCREATIVES. All rights reserved.
+        <div className="flex flex-col gap-4 border-t border-paper/12 py-7 text-[10px] uppercase tracking-[0.16em] text-paper/35 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            &copy; {new Date().getFullYear()} {site.legalName}. All rights reserved.
           </p>
-          <p className="text-sm text-slate-500">
-            Designed and produced in Nairobi, delivered across Kenya.
+          <p className="flex items-center gap-2">
+            <span className="h-1 w-1 rounded-full bg-gold" />
+            {site.tagline}
           </p>
+          <p>Nairobi · Kenya</p>
         </div>
       </div>
     </footer>
