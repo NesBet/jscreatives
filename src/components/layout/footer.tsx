@@ -149,7 +149,7 @@ export function Footer() {
             <span className="h-1 w-1 rounded-full bg-gold" />
             {site.tagline}
           </p>
-          <p>Nairobi · Kenya</p>
+          <p>Luthuli Street, Nairobi, Kenya</p>
         </div>
       </div>
     </footer>
