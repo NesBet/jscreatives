@@ -90,11 +90,11 @@ export default function HomePage() {
           <div className="flex flex-col gap-3 border-b border-line pb-5 text-[10px] font-semibold uppercase tracking-[0.19em] text-stone sm:flex-row sm:items-center sm:justify-between">
             <span className="inline-flex items-center gap-2.5">
               <span className="gold-dot" />
-              {site.location} · Print &amp; Brand Studio
+               Print &amp; Brand Studio
             </span>
             <span className="inline-flex items-center gap-2 text-ink">
               {site.tagline}
-              <ArrowUpRight className="h-3 w-3 text-gold" />
+              {/*<ArrowUpRight className="h-3 w-3 text-gold" />*/}
             </span>
           </div>
 
