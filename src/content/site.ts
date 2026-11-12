@@ -12,8 +12,8 @@ export const site = {
   phoneDisplay: "+254 792 232 027",
   whatsapp: "254792232027",
   whatsappMessage:
-    "Hello JsCreatives, I would like to inquire about your printing and branding services.",
-  email: "hello@jscreatives.com",
+    "Hello JsCreatives Team, I would like to inquire about your printing and branding services.",
+  email: "salesjscreatives@gmail.com",
   location: "Ramogi Hse(Rm 319), Nairobi, Kenya",
   locationNote: "Serving clients across Kenya and East Africa.",
   hours: [
