@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/site/page-hero";
 import { SiteButton } from "@/components/ui/site-button";
 import { PortfolioBrowser } from "@/components/portfolio/portfolio-browser";
+import { BrandingJourneys } from "@/components/portfolio/branding-journeys";
+import { portfolioItems } from "@/content/portfolio";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+import { getPublishedCaseStudies } from "@/lib/case-studies";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Our Portfolio",
@@ -10,7 +16,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/portfolio" },
 };
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const images = await getSiteImageMap();
+  const hero = resolveSiteImage(images, "portfolio:hero");
+  const items = portfolioItems.map((item) => ({
+    ...item,
+    image: resolveSiteImage(images, `portfolio:${item.id}:image`).url,
+  }));
+  const stories = await getPublishedCaseStudies({ limit: 6 });
+
   return (
     <>
       <PageHero
@@ -29,8 +43,8 @@ export default function PortfolioPage() {
             from the studio.
           </p>
         }
-        image="/images/brand/work-asali-botanics.jpg"
-        imageAlt="Label and packaging design produced for Asali Botanics"
+        image={hero.url}
+        imageAlt={hero.altText}
       >
         <SiteButton href="/quote" variant="ink">
           Start a project
@@ -40,7 +54,9 @@ export default function PortfolioPage() {
         </SiteButton>
       </PageHero>
 
-      <PortfolioBrowser />
+      <PortfolioBrowser items={items} />
+
+      <BrandingJourneys stories={stories} />
 
       <section className="border-t border-line bg-paper-deep py-16 lg:py-20">
         <div className="container-wide flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">

@@ -4,6 +4,9 @@ import { SiteButton } from "@/components/ui/site-button";
 import { Reveal } from "@/components/ui/reveal";
 import { CatalogBrowser } from "@/components/catalog/catalog-browser";
 import { CATALOG } from "@/content/catalog";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Our Products",
@@ -30,7 +33,13 @@ const orderingSteps = [
   },
 ];
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const images = await getSiteImageMap();
+  const products = CATALOG.map((product) => ({
+    ...product,
+    image: resolveSiteImage(images, `product:${product.slug}:image`).url,
+  }));
+
   return (
     <>
       <PageHero
@@ -60,7 +69,7 @@ export default function ProductsPage() {
         </SiteButton>
       </PageHero>
 
-      <CatalogBrowser products={CATALOG} />
+      <CatalogBrowser products={products} />
 
       <section className="border-y border-line bg-paper-deep py-16 lg:py-20">
         <div className="container-wide">

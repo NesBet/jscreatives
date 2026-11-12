@@ -18,16 +18,20 @@ const aspectClass: Record<NonNullable<PortfolioItem["size"]>, string> = {
   normal: "aspect-square",
 };
 
-export function PortfolioBrowser() {
+export function PortfolioBrowser({
+  items = portfolioItems,
+}: {
+  items?: PortfolioItem[];
+}) {
   const [category, setCategory] = useState<PortfolioCategory | "All">("All");
   const [selected, setSelected] = useState<PortfolioItem | null>(null);
 
   const filtered = useMemo(
     () =>
       category === "All"
-        ? portfolioItems
-        : portfolioItems.filter((item) => item.category === category),
-    [category]
+        ? items
+        : items.filter((item) => item.category === category),
+    [category, items]
   );
 
   useEffect(() => {

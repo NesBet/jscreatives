@@ -73,11 +73,31 @@ npm run seed
 This creates:
 - **Admin**: phone `+254780237794` (email `admin@jscreatives.com`, role `ADMIN`)
 - **Customer**: Nesh Rono, phone `+254794249775` (email `nesh.rono69@gmail.com`, role `CUSTOMER`)
-- **18 branded products** across 7 categories (apparel, headwear, bags, drinkware, stationery, signage, packaging) with images, print methods and option variants
+- **21 branded products** across 7 categories (apparel, headwear, bags, drinkware, stationery, signage, packaging) with images, print methods and option variants
 
 Seeded accounts use `ACCOUNT_DEFAULT_PASSWORD_HASH` as their password hash.
 
-### 5. Start Development Server
+### 5. Media Library
+
+The admin includes a media library and website image manager:
+
+- `/admin/media` — upload images or register an existing image URL.
+- `/admin/site-images` — replace the homepage collage, product photography, portfolio images and social gallery.
+- `/admin/case-studies` — publish behind-the-scenes branding journeys with photo galleries.
+
+Uploads use a public Supabase Storage bucket. Add these values to `.env`:
+
+```bash
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-or-secret-key"
+SUPABASE_STORAGE_BUCKET="media"
+```
+
+Create the bucket in the Supabase dashboard and mark it public. Use the server-side service-role/secret key, not the publishable/anon key. Never expose it with a `NEXT_PUBLIC_` prefix. Uploads are disabled until these values are configured, but images can still be added by URL.
+
+Public site pages that read managed images and stories render dynamically so admin changes are reflected immediately.
+
+### 6. Start Development Server
 
 ```bash
 npm run dev
@@ -101,6 +121,9 @@ Sign in by entering the phone number and the WhatsApp OTP (delivered via the con
 ### Admin
 - Dashboard with sales metrics for admin.
 - Product CRUD management.
+- Media library with Supabase Storage uploads and URL imports.
+- Website image manager for the homepage collage, products, portfolio and studio gallery.
+- Branding journey editor with behind-the-scenes galleries for the public portfolio.
 - Order management with status updates.
 - User management.
 - Payment transaction logs and audit logging.

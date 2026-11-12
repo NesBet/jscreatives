@@ -16,8 +16,11 @@ import { SiteButton } from "@/components/ui/site-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { ProductCard } from "@/components/site/product-card";
+import { BrandingJourneys } from "@/components/portfolio/branding-journeys";
 import { CATALOG } from "@/content/catalog";
 import { portfolioItems } from "@/content/portfolio";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+import { getPublishedCaseStudies } from "@/lib/case-studies";
 import { services } from "@/content/services";
 import {
   homeProcess,
@@ -27,6 +30,8 @@ import {
   whyChoose,
   socialGallery,
 } from "@/content/site";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
@@ -80,7 +85,27 @@ const disciplines = [
   "Event branding",
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const images = await getSiteImageMap();
+  const heroCollage = resolveSiteImage(images, "home:hero-collage");
+  const studioImage = resolveSiteImage(images, "home:studio-image");
+  const trustAvatars = [1, 2, 3].map((index) =>
+    resolveSiteImage(images, `home:trust-avatar-${index}`)
+  );
+  const products = featuredProducts.map((product) => ({
+    ...product,
+    image: resolveSiteImage(images, `product:${product.slug}:image`).url,
+  }));
+  const work = featuredWork.map((item) => {
+    const image = resolveSiteImage(images, `portfolio:${item.id}:image`);
+    return { ...item, image: image.url, imageAlt: image.altText };
+  });
+  const gallery = socialGallery.map((item, index) => {
+    const image = resolveSiteImage(images, `gallery:${index + 1}:image`);
+    return { ...item, image: image.url, altText: image.altText };
+  });
+  const stories = await getPublishedCaseStudies({ limit: 3, featuredOnly: true });
+
   return (
     <>
       <section className="relative overflow-hidden border-b border-line">
@@ -140,16 +165,20 @@ export default function HomePage() {
               </div>
               <div className="mt-10 flex items-center gap-4">
                 <div className="flex -space-x-2">
-                  {["/images/brand/merch-cap.jpg", "/images/brand/merch-mug.jpg", "/images/brand/merch-notebook.jpg"].map(
-                    (src) => (
-                      <span
-                        key={src}
-                        className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-paper"
-                      >
-                        <Image src={src} alt="" fill sizes="36px" className="object-cover" />
-                      </span>
-                    )
-                  )}
+                  {trustAvatars.map((avatar) => (
+                    <span
+                      key={avatar.url}
+                      className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-paper"
+                    >
+                      <Image
+                        src={avatar.url}
+                        alt={avatar.altText}
+                        fill
+                        sizes="36px"
+                        className="object-cover"
+                      />
+                    </span>
+                  ))}
                 </div>
                 <p className="text-[11px] leading-relaxed text-stone">
                   Trusted by teams, founders
@@ -162,8 +191,8 @@ export default function HomePage() {
             <div className="lg:col-span-8">
               <div className="group relative aspect-[16/10] overflow-hidden bg-charcoal">
                 <Image
-                  src="/images/brand/hero-work-collage.jpg"
-                  alt="A collection of branded merchandise, print and packaging produced by JsCreatives"
+                  src={heroCollage.url}
+                  alt={heroCollage.altText}
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
@@ -319,7 +348,7 @@ export default function HomePage() {
           </Reveal>
 
           <div className="mt-14 grid gap-5 md:grid-cols-12">
-            {featuredWork.map((item, index) => {
+            {work.map((item, index) => {
               const spans = [
                 "md:col-span-7 aspect-[16/11]",
                 "md:col-span-5 aspect-[16/11]",
@@ -339,7 +368,7 @@ export default function HomePage() {
                   >
                     <Image
                       src={item.image}
-                      alt={`${item.title} for ${item.client}`}
+                      alt={item.imageAlt}
                       fill
                       sizes={index < 2 ? "(max-width: 768px) 100vw, 58vw" : "(max-width: 768px) 100vw, 33vw"}
                       className="object-cover transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
@@ -366,6 +395,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <BrandingJourneys stories={stories} compact />
+
       <section className="border-y border-line bg-paper-deep py-20 lg:py-28">
         <div className="container-wide">
           <Reveal>
@@ -384,7 +415,7 @@ export default function HomePage() {
           </Reveal>
 
           <div className="mt-14 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredProducts.map((product, index) => (
+            {products.map((product, index) => (
               <Reveal key={product.slug} delay={index * 70}>
                 <ProductCard product={product} />
               </Reveal>
@@ -422,8 +453,8 @@ export default function HomePage() {
           <Reveal className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden">
               <Image
-                src="/images/brand/work-lumen-studio.jpg"
-                alt="Branded stationery and print collateral produced for Lumen Studio"
+                src={studioImage.url}
+                alt={studioImage.altText}
                 fill
                 sizes="(max-width: 1024px) 100vw, 42vw"
                 className="object-cover"
@@ -581,7 +612,7 @@ export default function HomePage() {
           </Reveal>
 
           <div className="mt-10 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-            {socialGallery.map((item, index) => (
+            {gallery.map((item, index) => (
               <Reveal key={item.caption} delay={index * 45}>
                 <Link
                   href="https://instagram.com/jscreatives__/"
@@ -592,7 +623,7 @@ export default function HomePage() {
                 >
                   <Image
                     src={item.image}
-                    alt={item.caption}
+                    alt={item.altText}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"

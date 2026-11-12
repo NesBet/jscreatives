@@ -149,3 +149,45 @@ export const quoteSchema = z.object({
     .or(z.literal('')),
   website: z.string().max(0).optional().or(z.literal('')),
 })
+
+export const mediaAssetSchema = z.object({
+  url: z.string().url('Enter a valid image URL'),
+  altText: z.string().max(300).optional().or(z.literal('')),
+  caption: z.string().max(500).optional().or(z.literal('')),
+  folder: z.string().max(80).optional(),
+})
+
+export const siteImageSchema = z.object({
+  key: z.string().min(1).max(160),
+  url: z.string().min(1, 'Image URL is required').max(2000),
+  altText: z.string().max(300).optional().or(z.literal('')),
+})
+
+const caseStudyImageSchema = z.object({
+  url: z.string().min(1, 'Image URL is required').max(2000),
+  altText: z.string().max(300).optional().or(z.literal('')),
+  caption: z.string().max(500).optional().or(z.literal('')),
+  stage: z.string().max(80).optional().or(z.literal('')),
+  sortOrder: z.number().int().min(0).optional(),
+})
+
+export const caseStudySchema = z.object({
+  slug: z
+    .string()
+    .min(2, 'Slug is required')
+    .max(120)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers and hyphens'),
+  title: z.string().min(2, 'Title is required').max(180),
+  client: z.string().min(1, 'Client is required').max(160),
+  category: z.string().min(1, 'Category is required').max(120),
+  summary: z.string().min(10, 'Summary is required').max(500),
+  story: z.string().min(20, 'Story is required').max(20000),
+  services: z.array(z.string().max(120)).max(20).optional(),
+  year: z.string().min(4, 'Year is required').max(20),
+  coverUrl: z.string().min(1, 'Cover image is required').max(2000),
+  coverAlt: z.string().max(300).optional().or(z.literal('')),
+  featured: z.boolean().default(false),
+  published: z.boolean().default(false),
+  sortOrder: z.number().int().min(0).default(0),
+  images: z.array(caseStudyImageSchema).max(40).optional(),
+})

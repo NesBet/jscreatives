@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/site/product-card";
 import { Reveal } from "@/components/ui/reveal";
 import { CATALOG, getCatalogProduct } from "@/content/catalog";
 import { categoryLabel, printMethodLabel } from "@/constants";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -19,9 +20,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = getCatalogProduct(slug);
+  const catalogProduct = getCatalogProduct(slug);
+  if (!catalogProduct) return {};
 
-  if (!product) return {};
+  const images = await getSiteImageMap();
+  const product = {
+    ...catalogProduct,
+    image: resolveSiteImage(images, `product:${catalogProduct.slug}:image`).url,
+  };
 
   return {
     title: product.name,
@@ -35,15 +41,26 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getCatalogProduct(slug);
+  const catalogProduct = getCatalogProduct(slug);
+  if (!catalogProduct) notFound();
 
-  if (!product) notFound();
-
+  const images = await getSiteImageMap();
+  const product = {
+    ...catalogProduct,
+    image: resolveSiteImage(images, `product:${catalogProduct.slug}:image`).url,
+  };
   const related = CATALOG.filter(
     (item) => item.category === product.category && item.slug !== product.slug
-  ).slice(0, 4);
+  )
+    .slice(0, 4)
+    .map((item) => ({
+      ...item,
+      image: resolveSiteImage(images, `product:${item.slug}:image`).url,
+    }));
 
   const schema = {
     "@context": "https://schema.org",
