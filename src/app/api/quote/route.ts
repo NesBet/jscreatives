@@ -144,6 +144,8 @@ export async function POST(request: Request) {
         artworkName,
         artworkType,
         artworkSize,
+        artworkData,
+        artworkEncoding: artworkData ? 'base64' : null,
       }
 
       try {
