@@ -45,7 +45,7 @@ export const socialLinks = [
   },
   {
     label: "Facebook",
-    href: "https://www.facebook.com/jscreatives",
+    href: "https://www.facebook.com/Nyambstyles/",
     handle: "JsCreatives",
   },
   {
@@ -56,7 +56,7 @@ export const socialLinks = [
   {
     label: "WhatsApp",
     href: whatsappUrl,
-    handle: "+254 780 237 794",
+    handle: "+254 792 232 027",
   },
 ] as const;
 

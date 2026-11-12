@@ -87,16 +87,16 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -right-40 top-0 h-[38rem] w-[38rem] rounded-full bg-gold/8 blur-3xl" aria-hidden="true" />
 
         <div className="container-wide relative z-10 pt-8 pb-12 lg:pt-12 lg:pb-16">
-          <div className="flex flex-col gap-3 border-b border-line pb-5 text-[10px] font-semibold uppercase tracking-[0.19em] text-stone sm:flex-row sm:items-center sm:justify-between">
+          {/*<div className="flex flex-col gap-3 border-b border-line pb-5 text-[10px] font-semibold uppercase tracking-[0.19em] text-stone sm:flex-row sm:items-center sm:justify-between">
             <span className="inline-flex items-center gap-2.5">
               <span className="gold-dot" />
                Print &amp; Brand Studio
             </span>
             <span className="inline-flex items-center gap-2 text-ink">
               {site.tagline}
-              {/*<ArrowUpRight className="h-3 w-3 text-gold" />*/}
+              <ArrowUpRight className="h-3 w-3 text-gold" />
             </span>
-          </div>
+          </div>*/}
 
           <div className="relative mt-9 lg:mt-12">
             <div
