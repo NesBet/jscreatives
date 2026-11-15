@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback, Fragment } from "react";
 import { useAuth } from "@/components/layout/auth-provider";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
-import { Button } from "@/components/ui/button";
-import { PerPageSelector } from "@/components/ui/per-page-selector";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { OrderStatusDropdown } from "@/components/admin/order-status-dropdown";
 import { formatPrice } from "@/lib/utils";
 import { PRODUCT_PER_PAGE } from "@/constants";
@@ -94,11 +93,12 @@ export default function AdminOrdersPage() {
   if (authLoading || !user) return null;
 
   const statusColors: Record<string, string> = {
-    PENDING: "text-yellow-400",
-    PROCESSING: "text-blue-400",
-    SHIPPED: "text-purple-400",
-    DELIVERED: "text-green-400",
+    PENDING: "text-gold-soft",
+    PROCESSING: "text-gold",
+    SHIPPED: "text-paper",
+    DELIVERED: "text-gold-soft",
     CANCELLED: "text-red-400",
+    REFUNDED: "text-paper/50",
   };
 
   return (
@@ -112,7 +112,7 @@ export default function AdminOrdersPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
           >
             <option value="">All Order Statuses</option>
             {ORDER_STATUSES.map((s) => (
@@ -134,7 +134,7 @@ export default function AdminOrdersPage() {
                 }}
                 className={`rounded-md px-3 py-1.5 text-sm transition-colors duration-200 ${
                   paymentFilter === f.v
-                    ? "bg-red-600 text-white"
+                    ? "bg-gold font-semibold text-ink"
                     : "text-slate-300 hover:bg-slate-700"
                 }`}
               >
@@ -184,7 +184,7 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="p-4 text-white font-medium">{formatPrice(Number(order.total))}</td>
                       <td className="p-4">
-                        <span className={order.payment?.status === "SUCCESS" ? "text-green-400" : "text-yellow-400"}>
+                        <span className={order.payment?.status === "SUCCESS" ? "text-gold-soft" : order.payment?.status === "FAILED" ? "text-red-400" : "text-gold"}>
                           {order.payment?.status || "N/A"}
                         </span>
                       </td>
@@ -257,23 +257,17 @@ export default function AdminOrdersPage() {
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-              Prev
-            </Button>
-            <span className="text-sm text-slate-400">{page} / {totalPages}</span>
-            <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-              Next
-            </Button>
-            <PerPageSelector
-              value={perPage}
-              onChange={(v) => {
-                setPerPage(v);
-                setPage(1);
-              }}
-            />
-          </div>
+        {orders.length > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </>

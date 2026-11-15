@@ -68,10 +68,12 @@ export default function AdminDashboardPage() {
   if (!data) return null;
 
   const statusColors: Record<string, string> = {
-    PENDING: "text-yellow-400",
-    PROCESSING: "text-blue-400",
-    SHIPPED: "text-purple-400",
-    DELIVERED: "text-green-400",
+    PENDING: "text-gold-soft",
+    PROCESSING: "text-gold",
+    SHIPPED: "text-paper",
+    DELIVERED: "text-gold-soft",
+    CANCELLED: "text-red-400",
+    REFUNDED: "text-paper/50",
   };
 
   return (

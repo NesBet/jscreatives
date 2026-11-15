@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/layout/auth-provider";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
-import { Button } from "@/components/ui/button";
-import { PerPageSelector } from "@/components/ui/per-page-selector";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { formatPrice } from "@/lib/utils";
 import { PRODUCT_PER_PAGE } from "@/constants";
 
@@ -61,10 +60,10 @@ export default function AdminPaymentsPage() {
   if (authLoading || !user) return null;
 
   const statusColors: Record<string, string> = {
-    SUCCESS: "text-green-400",
-    PENDING: "text-yellow-400",
+    SUCCESS: "text-gold-soft",
+    PENDING: "text-gold",
     FAILED: "text-red-400",
-    REFUNDED: "text-purple-400",
+    REFUNDED: "text-paper/50",
   };
 
   return (
@@ -120,23 +119,17 @@ export default function AdminPaymentsPage() {
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-              Prev
-            </Button>
-            <span className="text-sm text-slate-400">{page} / {totalPages}</span>
-            <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-              Next
-            </Button>
-            <PerPageSelector
-              value={perPage}
-              onChange={(v) => {
-                setPerPage(v);
-                setPage(1);
-              }}
-            />
-          </div>
+        {payments.length > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </>

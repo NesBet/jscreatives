@@ -4,8 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/components/layout/auth-provider";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
-import { Button } from "@/components/ui/button";
-import { PerPageSelector } from "@/components/ui/per-page-selector";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PRODUCT_PER_PAGE } from "@/constants";
 
 interface AuditLog {
@@ -105,23 +104,17 @@ export default function AdminAuditPage() {
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-              Prev
-            </Button>
-            <span className="text-sm text-slate-400">{page} / {totalPages}</span>
-            <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-              Next
-            </Button>
-            <PerPageSelector
-              value={perPage}
-              onChange={(v) => {
-                setPerPage(v);
-                setPage(1);
-              }}
-            />
-          </div>
+        {logs.length > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </>

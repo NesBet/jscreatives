@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowUpRight, Mail, MapPin, Menu, Phone, X } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Menu, Phone, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { useAuth } from "@/components/layout/auth-provider";
 import { navLinks, site, whatsappUrl } from "@/content/site";
@@ -173,8 +173,20 @@ export function Header() {
           </button>
         </div>
 
-        <div className="container-wide flex h-[calc(100dvh-74px)] flex-col overflow-y-auto py-8">
-          <nav aria-label="Mobile navigation" className="flex flex-col">
+        <div className="container-wide flex h-[calc(100dvh-74px)] flex-col overflow-y-auto py-6">
+          <Link
+            href={accountHref}
+            onClick={() => setOpen(false)}
+            className="flex h-12 shrink-0 items-center justify-between border border-line px-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:border-ink"
+          >
+            <span className="flex items-center gap-3">
+              <UserRound className="h-4 w-4 text-gold" strokeWidth={1.7} />
+              {accountLabel}
+            </span>
+            <ArrowUpRight className="h-4 w-4 text-stone" />
+          </Link>
+
+          <nav aria-label="Mobile navigation" className="mt-6 flex flex-col">
             {navLinks.map((link, index) => (
               <Link
                 key={link.href}

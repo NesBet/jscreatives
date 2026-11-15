@@ -53,7 +53,7 @@ function CountryPhoneInput({
           onChange={(e) => onCountryChange(e.target.value)}
           aria-label="Country code"
           disabled={disabled}
-          className="h-12 w-auto shrink-0 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-sm text-white outline-none transition-colors focus:border-red-500 disabled:opacity-50"
+          className="h-12 w-auto shrink-0 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-sm text-white outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30 disabled:opacity-50"
         >
           {EAST_AFRICA_COUNTRIES.map((c) => (
             <option key={c.iso} value={c.dial}>
@@ -69,7 +69,7 @@ function CountryPhoneInput({
           disabled={disabled}
           onChange={(e) => onPhoneChange(e.target.value.replace(/[^0-9]/g, ''))}
           placeholder="780237794"
-          className="h-12 min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-white outline-none transition-colors focus:border-red-500 disabled:opacity-50"
+          className="h-12 min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-white outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30 disabled:opacity-50"
           autoComplete="tel-national"
         />
       </div>
@@ -339,11 +339,11 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
     <div className="flex min-h-[calc(100vh-120px)] items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         <div
-          className="rounded-2xl border border-slate-700/60 bg-slate-800/50 p-8 shadow-2xl shadow-black/40 backdrop-blur-sm transition-all duration-300 hover:border-red-500/40"
+          className="rounded-2xl border border-slate-700/60 bg-slate-800/50 p-8 shadow-2xl shadow-black/50 backdrop-blur-sm transition-all duration-300 hover:border-gold/40"
           style={fade(0)}
         >
           <div
-            className="mx-auto mb-6 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/25 ring-1 ring-white/15"
+            className="mx-auto mb-6 h-16 w-16 overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/30 ring-1 ring-gold/30"
             style={{ animation: 'float 6s ease-in-out infinite' }}
           >
             <Image
@@ -391,7 +391,7 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
                 </div>
 
                 <div style={fade(240)}>
-                  <Button type="submit" className="w-full" size="lg" loading={loading}>
+                  <Button type="submit" variant="gold" className="w-full" size="lg" loading={loading}>
                     Continue
                   </Button>
                 </div>
@@ -405,7 +405,7 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
                   <p className="text-sm text-slate-400">No account found with this number.</p>
                   <Button
                     type="button"
-                    variant="primary"
+                    variant="gold"
                     size="md"
                     className="mt-3 w-full"
                     onClick={() => {
@@ -488,7 +488,7 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
                 </div>
 
                 <div style={fade(360)}>
-                  <Button type="submit" className="w-full" size="lg" loading={loading}>
+                  <Button type="submit" variant="gold" className="w-full" size="lg" loading={loading}>
                     Create Account
                   </Button>
                 </div>
@@ -549,6 +549,7 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
                 <div style={fade(240)}>
                   <Button
                     type="submit"
+                    variant="gold"
                     className="w-full"
                     size="lg"
                     loading={loading}
@@ -575,7 +576,7 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
                   type="button"
                   onClick={() => requestOtp(mode)}
                   disabled={loading || locked}
-                  className="text-red-500 transition-colors hover:text-red-400 disabled:opacity-50"
+                  className="text-gold transition-colors hover:text-gold-soft disabled:opacity-50"
                 >
                   Resend code
                 </button>

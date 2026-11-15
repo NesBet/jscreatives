@@ -183,6 +183,35 @@
   }
 }
 
+.admin-theme,
+.auth-theme {
+  --color-slate-50: #fcfaf5;
+  --color-slate-100: #f6f2e9;
+  --color-slate-200: #ece6da;
+  --color-slate-300: #d8d0c1;
+  --color-slate-400: #a69d8e;
+  --color-slate-500: #716a5e;
+  --color-slate-600: #514a3f;
+  --color-slate-700: #38332b;
+  --color-slate-800: #23201c;
+  --color-slate-900: #1a1815;
+  --color-slate-950: #121110;
+
+  --color-amber-200: #f0e4cf;
+  --color-amber-300: #d7bd8e;
+  --color-amber-400: #b08442;
+  --color-amber-500: #b08442;
+  --color-amber-600: #96702f;
+  --color-amber-700: #7a5a24;
+
+  --color-red-200: #f1cbc8;
+  --color-red-300: #e4a29d;
+  --color-red-400: #d66a64;
+  --color-red-500: #c22f2a;
+  --color-red-600: #a82723;
+  --color-red-700: #8a1f1c;
+}
+
 @layer utilities {
   .container-wide {
     width: 100%;

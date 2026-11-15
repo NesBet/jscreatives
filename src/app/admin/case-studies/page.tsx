@@ -226,13 +226,13 @@ export default function AdminCaseStudiesPage() {
             <p className="mt-1 text-xs text-slate-500">
               Published stories appear on the portfolio page. Add gallery images
               from the{" "}
-              <Link href="/admin/media" className="text-red-400 hover:text-red-300">
+              <Link href="/admin/media" className="text-gold-soft hover:text-gold-tint">
                 Media Library
               </Link>
               .
             </p>
           </div>
-          <Button type="button" onClick={openCreate}>New branding journey</Button>
+          <Button type="button" variant="gold" onClick={openCreate}>New branding journey</Button>
         </div>
 
         {loading ? (
@@ -240,7 +240,7 @@ export default function AdminCaseStudiesPage() {
         ) : stories.length === 0 ? (
           <div className="mt-8 rounded-xl border border-dashed border-slate-700 p-10 text-center">
             <p className="text-sm text-slate-400">No branding journeys yet.</p>
-            <Button type="button" onClick={openCreate} className="mt-4">
+            <Button type="button" variant="gold" onClick={openCreate} className="mt-4">
               Create the first story
             </Button>
           </div>
@@ -263,8 +263,8 @@ export default function AdminCaseStudiesPage() {
                     <span
                       className={`rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
                         story.published
-                          ? "bg-emerald-500/90 text-slate-950"
-                          : "bg-amber-500/90 text-slate-950"
+                          ? "bg-gold text-ink"
+                          : "bg-white/10 text-paper"
                       }`}
                     >
                       {story.published ? "Live" : "Draft"}
@@ -288,7 +288,7 @@ export default function AdminCaseStudiesPage() {
                     {story.category} · {story.images.length} gallery images
                   </p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
-                    <Button type="button" size="sm" onClick={() => openEdit(story)}>
+                    <Button type="button" size="sm" variant="gold" onClick={() => openEdit(story)}>
                       Edit
                     </Button>
                     {story.published && (
@@ -374,7 +374,7 @@ export default function AdminCaseStudiesPage() {
                   <select
                     value={form.category}
                     onChange={(event) => setForm({ ...form, category: event.target.value })}
-                    className="mt-1.5 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                    className="mt-1.5 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                   >
                     {portfolioCategories.map((category) => (
                       <option key={category} value={category}>{category}</option>
@@ -526,7 +526,7 @@ export default function AdminCaseStudiesPage() {
                           aria-label={`Image stage ${index + 1}`}
                           value={image.stage}
                           onChange={(event) => updateImage(index, { stage: event.target.value })}
-                          className="block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                          className="block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                         >
                           {stages.map((stage) => (
                             <option key={stage} value={stage}>{stage.replaceAll("_", " ")}</option>
@@ -584,7 +584,7 @@ export default function AdminCaseStudiesPage() {
               <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>
                 Cancel
               </Button>
-              <Button type="submit" loading={submitting}>
+              <Button type="submit" variant="gold" loading={submitting}>
                 {editing ? "Save changes" : "Create story"}
               </Button>
             </div>

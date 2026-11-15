@@ -12,10 +12,10 @@ export const ORDER_STATUSES = [
 ] as const;
 
 export const STATUS_STYLES: Record<string, { dot: string; badge: string; label: string }> = {
-  PENDING: { dot: "bg-yellow-400", badge: "bg-yellow-600/15 text-yellow-400", label: "Pending" },
-  PROCESSING: { dot: "bg-blue-400", badge: "bg-blue-600/15 text-blue-400", label: "Processing" },
-  SHIPPED: { dot: "bg-purple-400", badge: "bg-purple-600/15 text-purple-400", label: "Shipped" },
-  DELIVERED: { dot: "bg-green-400", badge: "bg-green-600/15 text-green-400", label: "Delivered" },
+  PENDING: { dot: "bg-gold-soft", badge: "bg-gold/10 text-gold-soft", label: "Pending" },
+  PROCESSING: { dot: "bg-gold", badge: "bg-gold/15 text-gold", label: "Processing" },
+  SHIPPED: { dot: "bg-paper", badge: "bg-white/10 text-paper", label: "Shipped" },
+  DELIVERED: { dot: "bg-gold-soft", badge: "bg-gold/20 text-gold-soft", label: "Delivered" },
   CANCELLED: { dot: "bg-red-400", badge: "bg-red-600/15 text-red-400", label: "Cancelled" },
   REFUNDED: { dot: "bg-slate-400", badge: "bg-slate-600/15 text-slate-400", label: "Refunded" },
 };

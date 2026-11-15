@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/layout/auth-provider";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 
 interface QuoteRequest {
   id: string;
@@ -41,13 +42,13 @@ const QUOTE_STATUSES = ["NEW", "CONTACTED", "QUOTED", "WON", "CLOSED"];
 const MESSAGE_STATUSES = ["NEW", "READ", "REPLIED", "CLOSED"];
 
 const statusStyles: Record<string, string> = {
-  NEW: "text-amber-300",
-  CONTACTED: "text-blue-300",
-  QUOTED: "text-purple-300",
-  WON: "text-emerald-300",
-  REPLIED: "text-emerald-300",
-  READ: "text-blue-300",
-  CLOSED: "text-slate-400",
+  NEW: "text-gold-soft",
+  CONTACTED: "text-gold",
+  QUOTED: "text-paper",
+  WON: "text-gold-soft",
+  REPLIED: "text-paper",
+  READ: "text-gold",
+  CLOSED: "text-paper/50",
 };
 
 function formatDate(value: string) {
@@ -111,7 +112,7 @@ function QuoteRow({
           <select
             value={quote.status}
             onChange={(event) => onUpdate(quote.id, { status: event.target.value })}
-            className={`rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold focus:border-amber-500 focus:outline-none ${statusStyles[quote.status] || "text-slate-300"}`}
+            className={`rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold focus:border-gold focus:outline-none ${statusStyles[quote.status] || "text-slate-300"}`}
             aria-label={`Status for ${quote.fullName}`}
           >
             {QUOTE_STATUSES.map((status) => (
@@ -145,7 +146,7 @@ function QuoteRow({
                   {quote.artworkName ? (
                     <a
                       href={`/api/admin/quotes/${quote.id}/artwork`}
-                      className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-amber-300 hover:text-amber-200"
+                      className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gold-soft hover:text-gold-tint"
                     >
                       {quote.artworkName}
                       <span className="text-xs text-slate-500">{formatBytes(quote.artworkSize)}</span>
@@ -168,18 +169,18 @@ function QuoteRow({
                   }}
                   rows={5}
                   placeholder="Quoted amount, follow-up date, production notes..."
-                  className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-amber-500 focus:outline-none"
+                  className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
                 />
                 <div className="mt-2 flex items-center gap-3">
                   <button
                     type="button"
                     onClick={saveNotes}
                     disabled={savingNotes}
-                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-semibold text-slate-950 transition-colors hover:bg-amber-400 disabled:opacity-60"
+                    className="rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-gold-soft disabled:opacity-60"
                   >
                     {savingNotes ? "Saving..." : "Save notes"}
                   </button>
-                  {notesSaved && <span className="text-xs text-emerald-400">Saved</span>}
+                  {notesSaved && <span className="text-xs text-gold-soft">Saved</span>}
                 </div>
                 <a
                   href={`mailto:${quote.email}?subject=${encodeURIComponent(`Your quote request with JsCreatives`)}`}
@@ -227,7 +228,7 @@ function MessageRow({
           <select
             value={message.status}
             onChange={(event) => onUpdate(message.id, event.target.value)}
-            className={`rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold focus:border-amber-500 focus:outline-none ${statusStyles[message.status] || "text-slate-300"}`}
+            className={`rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1.5 text-xs font-semibold focus:border-gold focus:outline-none ${statusStyles[message.status] || "text-slate-300"}`}
             aria-label={`Status for ${message.name}`}
           >
             {MESSAGE_STATUSES.map((status) => (
@@ -265,6 +266,7 @@ export default function AdminEnquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("");
@@ -277,7 +279,10 @@ export default function AdminEnquiriesPage() {
   }, [user, authLoading, router]);
 
   const fetchData = useCallback(async (signal: AbortSignal) => {
-    const params = new URLSearchParams({ page: page.toString(), perPage: "20" });
+    const params = new URLSearchParams({
+      page: page.toString(),
+      perPage: perPage.toString(),
+    });
     if (status) params.set("status", status);
     if (query) params.set("search", query);
 
@@ -298,7 +303,7 @@ export default function AdminEnquiriesPage() {
     } finally {
       if (!signal.aborted) setLoading(false);
     }
-  }, [tab, page, status, query]);
+  }, [tab, page, perPage, status, query]);
 
   useEffect(() => {
     if (user?.role !== "ADMIN") return;
@@ -371,7 +376,7 @@ export default function AdminEnquiriesPage() {
               onClick={() => changeTab(item.id as "quotes" | "messages")}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
                 tab === item.id
-                  ? "bg-amber-500 text-slate-950"
+                  ? "bg-gold text-ink"
                   : "text-slate-400 hover:bg-slate-800 hover:text-white"
               }`}
             >
@@ -396,7 +401,7 @@ export default function AdminEnquiriesPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search name, email, company..."
-            className="min-w-60 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-amber-500 focus:outline-none"
+            className="min-w-60 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
           />
           <select
             value={status}
@@ -406,7 +411,7 @@ export default function AdminEnquiriesPage() {
               setStatus(event.target.value);
               setPage(1);
             }}
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
           >
             <option value="">All statuses</option>
             {statuses.map((item) => (
@@ -473,26 +478,20 @@ export default function AdminEnquiriesPage() {
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-5 flex items-center justify-between text-sm text-slate-400">
-            <button
-              type="button"
-              onClick={() => changePage(Math.max(page - 1, 1))}
-              disabled={page === 1}
-              className="rounded-lg border border-slate-600 px-3 py-1.5 transition-colors hover:text-white disabled:opacity-40"
-            >
-              Previous
-            </button>
-            <span>Page {page} of {totalPages}</span>
-            <button
-              type="button"
-              onClick={() => changePage(Math.min(page + 1, totalPages))}
-              disabled={page === totalPages}
-              className="rounded-lg border border-slate-600 px-3 py-1.5 transition-colors hover:text-white disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
+        {total > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            perPageOptions={[12, 20, 40, 60, 80, 100]}
+            onPageChange={changePage}
+            onPerPageChange={(value) => {
+              setLoading(true);
+              setError("");
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </>

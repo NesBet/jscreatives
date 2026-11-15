@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
-import { PerPageSelector } from "@/components/ui/per-page-selector";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { formatPrice } from "@/lib/utils";
 import {
   CATEGORY_LABELS,
@@ -237,7 +237,7 @@ export default function AdminProductsPage() {
             }}
             className="max-w-sm"
           />
-          <Button onClick={handleCreate}>Add Product</Button>
+          <Button variant="gold" onClick={handleCreate}>Add Product</Button>
         </div>
 
         <div className="mt-6 overflow-x-auto rounded-xl bg-slate-800/50 border border-slate-700/50">
@@ -283,7 +283,7 @@ export default function AdminProductsPage() {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className={product.active ? "text-green-400" : "text-slate-500"}>
+                        <span className={product.active ? "text-gold-soft" : "text-slate-500"}>
                           {product.active ? "Yes" : "No"}
                         </span>
                       </td>
@@ -310,35 +310,16 @@ export default function AdminProductsPage() {
         </div>
 
         {products.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-            >
-              Prev
-            </Button>
-            <span className="text-sm text-slate-400">
-              {page} / {totalPages}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-            </Button>
-
-            <PerPageSelector
-              value={perPage}
-              onChange={(v) => {
-                setPerPage(v);
-                setPage(1);
-              }}
-            />
-          </div>
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
 
         {showModal && (
@@ -377,7 +358,7 @@ export default function AdminProductsPage() {
                     <select
                       value={form.category}
                       onChange={(e) => setForm({ ...form, category: e.target.value })}
-                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                     >
                       {PRODUCT_CATEGORIES.map((c) => (
                         <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
@@ -391,7 +372,7 @@ export default function AdminProductsPage() {
                     <select
                       value={form.printMethod}
                       onChange={(e) => setForm({ ...form, printMethod: e.target.value })}
-                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                      className="flex h-10 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                     >
                       {PRINT_METHODS.map((m) => (
                         <option key={m} value={m}>{PRINT_METHOD_LABELS[m]}</option>
@@ -470,7 +451,7 @@ export default function AdminProductsPage() {
                             value={v.option}
                             onChange={(e) => updateVariant(idx, "option", e.target.value)}
                             placeholder="e.g. Standard"
-                            className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                            className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-gold focus:outline-none"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -479,7 +460,7 @@ export default function AdminProductsPage() {
                             value={v.sku}
                             onChange={(e) => updateVariant(idx, "sku", e.target.value)}
                             placeholder="JS-TEE-M"
-                            className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                            className="h-9 w-32 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-gold focus:outline-none"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -490,7 +471,7 @@ export default function AdminProductsPage() {
                             value={v.stock}
                             onChange={(e) => updateVariant(idx, "stock", e.target.value)}
                             placeholder="0"
-                            className="h-9 w-20 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                            className="h-9 w-20 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-gold focus:outline-none"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -501,7 +482,7 @@ export default function AdminProductsPage() {
                             value={v.priceOverride}
                             onChange={(e) => updateVariant(idx, "priceOverride", e.target.value)}
                             placeholder="optional"
-                            className="h-9 w-28 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                            className="h-9 w-28 rounded-lg border border-slate-600 bg-slate-800 px-2 text-sm text-white focus:border-gold focus:outline-none"
                           />
                         </div>
                         <button
@@ -520,7 +501,7 @@ export default function AdminProductsPage() {
                   <Button variant="secondary" type="button" onClick={() => setShowModal(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" loading={submitting}>
+                  <Button variant="gold" type="submit" loading={submitting}>
                     {editingProduct ? "Update" : "Create"}
                   </Button>
                 </div>

@@ -94,7 +94,7 @@ export function OtpInput({ value, onChange, disabled, length = 6 }: OtpInputProp
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
-          className="h-14 w-12 rounded-xl border border-slate-700 bg-slate-900/60 text-center text-2xl font-semibold text-white outline-none transition-colors focus:border-red-500 focus:ring-2 focus:ring-red-500/30 disabled:opacity-50 sm:h-16 sm:w-14"
+          className="h-14 w-12 rounded-xl border border-slate-700 bg-slate-900/60 text-center text-2xl font-semibold text-white outline-none transition-colors focus:border-gold focus:ring-2 focus:ring-gold/30 disabled:opacity-50 sm:h-16 sm:w-14"
           aria-label={`Digit ${index + 1}`}
           style={{ animation: 'scale-in 0.3s var(--ease-spring) both', animationDelay: `${index * 50}ms` }}
         />

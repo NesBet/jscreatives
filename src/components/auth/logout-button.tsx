@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { LoaderCircle, LogOut, TriangleAlert, X } from "lucide-react";
 import { useAuth } from "@/components/layout/auth-provider";
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  tone?: "public" | "admin";
+}
+
+export function LogoutButton({ tone = "public" }: LogoutButtonProps) {
   const { user, setUser } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -14,6 +18,7 @@ export function LogoutButton() {
   const dialogRef = useRef<HTMLDivElement>(null);
   const cancelRef = useRef<HTMLButtonElement>(null);
   const submittingRef = useRef(false);
+  const isAdmin = tone === "admin";
 
   useEffect(() => {
     submittingRef.current = submitting;
@@ -91,10 +96,15 @@ export function LogoutButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 items-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+        aria-label={isAdmin ? "Log out of admin" : "Log out"}
+        className={
+          isAdmin
+            ? "inline-flex h-9 items-center gap-2 rounded-lg bg-gold px-3 text-xs font-semibold text-ink transition-colors hover:bg-gold-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            : "inline-flex h-11 items-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500"
+        }
       >
         <LogOut className="h-4 w-4" strokeWidth={1.8} />
-        Log out
+        <span className={isAdmin ? "hidden sm:inline" : undefined}>Log out</span>
       </button>
 
       {open && (
@@ -110,41 +120,75 @@ export function LogoutButton() {
             aria-modal="true"
             aria-labelledby="logout-title"
             aria-describedby="logout-description"
-            className="relative w-full max-w-md rounded-2xl border border-line bg-paper p-6 text-ink shadow-2xl animate-scale-in sm:p-7"
+            className={
+              isAdmin
+                ? "relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 text-white shadow-2xl animate-scale-in sm:p-7"
+                : "relative w-full max-w-md rounded-2xl border border-line bg-paper p-6 text-ink shadow-2xl animate-scale-in sm:p-7"
+            }
           >
             <button
               type="button"
               onClick={close}
               disabled={submitting}
-              className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-paper-deep hover:text-ink disabled:opacity-50"
+              className={
+                isAdmin
+                  ? "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-50"
+                  : "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-paper-deep hover:text-ink disabled:opacity-50"
+              }
               aria-label="Close logout confirmation"
             >
               <X className="h-4 w-4" strokeWidth={1.8} />
             </button>
 
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-600/10 text-red-600">
+            <span
+              className={
+                isAdmin
+                  ? "inline-flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-gold-soft"
+                  : "inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-600/10 text-red-600"
+              }
+            >
               <TriangleAlert className="h-6 w-6" strokeWidth={1.7} />
             </span>
 
             <h2
               id="logout-title"
-              className="mt-5 font-display text-2xl font-semibold tracking-[-0.03em] text-ink"
+              className={`mt-5 font-display text-2xl font-semibold tracking-[-0.03em] ${
+                isAdmin ? "text-white" : "text-ink"
+              }`}
             >
-              Log out of your account?
+              {isAdmin ? "Log out of admin?" : "Log out of your account?"}
             </h2>
-            <p id="logout-description" className="mt-3 text-sm leading-6 text-stone">
+            <p
+              id="logout-description"
+              className={`mt-3 text-sm leading-6 ${isAdmin ? "text-slate-400" : "text-stone"}`}
+            >
               {user?.email ? (
                 <>
-                  You are signed in as <span className="font-medium text-ink">{user.email}</span>.
-                  You will need to sign in again to view your orders and account details.
+                  You are signed in as{" "}
+                  <span className={`font-medium ${isAdmin ? "text-white" : "text-ink"}`}>
+                    {user.email}
+                  </span>
+                  .{" "}
+                  {isAdmin
+                    ? "You will need to sign in again to manage the site."
+                    : "You will need to sign in again to view your orders and account details."}
                 </>
+              ) : isAdmin ? (
+                "You will need to sign in again to manage the site."
               ) : (
                 "You will need to sign in again to view your orders and account details."
               )}
             </p>
 
             {error && (
-              <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+              <p
+                className={
+                  isAdmin
+                    ? "mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+                    : "mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                }
+                role="alert"
+              >
                 {error}
               </p>
             )}
@@ -155,7 +199,11 @@ export function LogoutButton() {
                 type="button"
                 onClick={close}
                 disabled={submitting}
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-line px-5 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-paper-deep disabled:opacity-50"
+                className={
+                  isAdmin
+                    ? "inline-flex h-11 items-center justify-center rounded-lg border border-slate-600 px-5 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-800 disabled:opacity-50"
+                    : "inline-flex h-11 items-center justify-center rounded-lg border border-line px-5 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-paper-deep disabled:opacity-50"
+                }
               >
                 Stay signed in
               </button>
@@ -163,7 +211,11 @@ export function LogoutButton() {
                 type="button"
                 onClick={handleLogout}
                 disabled={submitting}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className={
+                  isAdmin
+                    ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-ink transition-colors hover:bg-gold-soft disabled:cursor-not-allowed disabled:opacity-60"
+                    : "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                }
               >
                 {submitting ? (
                   <>

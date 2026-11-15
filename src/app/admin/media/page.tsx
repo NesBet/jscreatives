@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/layout/auth-provider";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +42,7 @@ export default function AdminMediaPage() {
   const [uploading, setUploading] = useState(false);
   const [addingUrl, setAddingUrl] = useState(false);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   const [folder, setFolder] = useState("all");
   const [search, setSearch] = useState("");
@@ -59,7 +61,7 @@ export default function AdminMediaPage() {
   }, [user, authLoading, router]);
 
   const fetchAssets = useCallback(async () => {
-    const params = new URLSearchParams({ page: String(page), perPage: "24" });
+    const params = new URLSearchParams({ page: String(page), perPage: String(perPage) });
     if (folder !== "all") params.set("folder", folder);
     if (query) params.set("search", query);
 
@@ -75,7 +77,7 @@ export default function AdminMediaPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, folder, query, toast]);
+  }, [page, perPage, folder, query, toast]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -194,7 +196,7 @@ export default function AdminMediaPage() {
               JPG, PNG, WebP, AVIF, GIF or SVG. Maximum 10MB.
             </p>
             {!configured && (
-              <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-relaxed text-amber-200">
+              <p className="mt-3 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs leading-relaxed text-gold-tint">
                 Supabase Storage is not configured yet. Add SUPABASE_URL and a
                 server-side secret key (SUPABASE_SERVICE_ROLE_KEY or
                 SUPABASE_SECRET_KEY), then restart the server. The publishable key
@@ -215,7 +217,7 @@ export default function AdminMediaPage() {
                   <select
                     value={uploadFolder}
                     onChange={(event) => setUploadFolder(event.target.value)}
-                    className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                   >
                     {folders.map((item) => (
                       <option key={item} value={item}>{item}</option>
@@ -237,7 +239,7 @@ export default function AdminMediaPage() {
                 placeholder="Optional caption for the image"
               />
             </div>
-            <Button type="submit" loading={uploading} disabled={!configured} className="mt-4">
+            <Button variant="gold" type="submit" loading={uploading} disabled={!configured} className="mt-4">
               Upload image
             </Button>
           </form>
@@ -265,7 +267,7 @@ export default function AdminMediaPage() {
                   <select
                     value={urlForm.folder}
                     onChange={(event) => setUrlForm({ ...urlForm, folder: event.target.value })}
-                    className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
                   >
                     {folders.map((item) => (
                       <option key={item} value={item}>{item}</option>
@@ -292,7 +294,7 @@ export default function AdminMediaPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search images..."
-            className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none"
+            className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
           />
           <select
             value={folder}
@@ -300,7 +302,7 @@ export default function AdminMediaPage() {
               setPage(1);
               setFolder(event.target.value);
             }}
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
           >
             <option value="all">All folders</option>
             {folders.map((item) => (
@@ -383,25 +385,18 @@ export default function AdminMediaPage() {
           </div>
         )}
 
-        <div className="mt-6 flex items-center justify-between text-sm text-slate-400">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setPage((value) => Math.max(1, value - 1))}
-            className="rounded-lg bg-slate-800 px-3 py-1.5 disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span>Page {page} of {totalPages}</span>
-          <button
-            type="button"
-            disabled={page >= totalPages}
-            onClick={() => setPage((value) => value + 1)}
-            className="rounded-lg bg-slate-800 px-3 py-1.5 disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
+        {assets.length > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
+        )}
       </div>
 
       {editing && (
@@ -428,7 +423,7 @@ export default function AdminMediaPage() {
               <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
                 Cancel
               </Button>
-              <Button type="submit" loading={saving}>Save changes</Button>
+              <Button variant="gold" type="submit" loading={saving}>Save changes</Button>
             </div>
           </form>
         </div>

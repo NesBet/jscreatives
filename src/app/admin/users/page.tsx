@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback, Fragment } from "react";
 import { useAuth } from "@/components/layout/auth-provider";
 import { useRouter } from "next/navigation";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { AdminPagination } from "@/components/admin/admin-pagination";
 import { Button } from "@/components/ui/button";
-import { PerPageSelector } from "@/components/ui/per-page-selector";
 import { useToast } from "@/components/ui/toast";
 import { PRODUCT_PER_PAGE } from "@/constants";
 
@@ -109,7 +109,7 @@ export default function AdminUsersPage() {
               }}
               className={`rounded-lg px-3 py-1.5 text-sm capitalize transition-colors duration-200 ${
                 filter === f
-                  ? "bg-red-600 text-white"
+                  ? "bg-gold font-semibold text-ink"
                   : "bg-slate-800 text-slate-300 hover:bg-slate-700"
               }`}
             >
@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
                       <td className="p-4">
                         <span
                           className={
-                            u.role === "ADMIN" ? "text-red-400" : "text-slate-300"
+                            u.role === "ADMIN" ? "text-gold-soft" : "text-slate-300"
                           }
                         >
                           {u.role}
@@ -162,13 +162,13 @@ export default function AdminUsersPage() {
                         <span
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             u.active
-                              ? "bg-green-600/15 text-green-400"
-                              : "bg-red-600/15 text-red-400"
+                              ? "bg-gold/15 text-gold-soft"
+                              : "bg-white/5 text-paper/40"
                           }`}
                         >
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
-                              u.active ? "bg-green-400" : "bg-red-400"
+                              u.active ? "bg-gold-soft" : "bg-paper/30"
                             }`}
                           />
                           {u.active ? "Active" : "Inactive"}
@@ -184,7 +184,7 @@ export default function AdminUsersPage() {
                               <select
                                 value={u.role}
                                 onChange={(e) => updateRole(u.id, e.target.value)}
-                                className="rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-white focus:border-red-500 focus:outline-none"
+                                className="rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-white focus:border-gold focus:outline-none"
                               >
                                 <option value="CUSTOMER">CUSTOMER</option>
                                 <option value="ADMIN">ADMIN</option>
@@ -211,35 +211,17 @@ export default function AdminUsersPage() {
           </table>
         </div>
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-            >
-              Prev
-            </Button>
-            <span className="text-sm text-slate-400">
-              {page} / {totalPages}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              Next
-            </Button>
-            <PerPageSelector
-              value={perPage}
-              onChange={(v) => {
-                setPerPage(v);
-                setPage(1);
-              }}
-            />
-          </div>
+        {users.length > 0 && (
+          <AdminPagination
+            page={page}
+            totalPages={totalPages}
+            perPage={perPage}
+            onPageChange={setPage}
+            onPerPageChange={(value) => {
+              setPerPage(value);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </>

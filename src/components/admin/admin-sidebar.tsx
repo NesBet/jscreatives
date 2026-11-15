@@ -52,7 +52,7 @@ export function AdminSidebar() {
       >
         <div className="flex h-16 items-center border-b border-slate-700 px-6">
           <Link href="/admin" className="text-lg font-bold text-white">
-            JS<span className="text-red-600">ADMIN</span>
+            JS<span className="text-gold">ADMIN</span>
           </Link>
         </div>
 
@@ -68,7 +68,7 @@ export function AdminSidebar() {
                     className={cn(
                       'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                       isActive
-                        ? 'bg-red-600/10 text-red-500'
+                        ? 'bg-gold/10 text-gold-soft'
                         : 'text-slate-400 hover:bg-slate-700 hover:text-white'
                     )}
                   >

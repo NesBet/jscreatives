@@ -70,7 +70,7 @@ function ImageSlot({
         <span
           className={`absolute left-2 top-2 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
             image.isOverride
-              ? "bg-emerald-500/90 text-slate-950"
+              ? "bg-gold text-ink"
               : "bg-slate-900/80 text-slate-300"
           }`}
         >
@@ -97,7 +97,7 @@ function ImageSlot({
           placeholder="Alt text"
         />
         <div className="flex flex-wrap gap-1.5">
-          <Button type="button" size="sm" loading={saving} onClick={save}>
+          <Button type="button" size="sm" variant="gold" loading={saving} onClick={save}>
             Save
           </Button>
           {image.isOverride && (
@@ -239,7 +239,7 @@ export default function AdminSiteImagesPage() {
             </p>
             <p className="mt-1 text-xs text-slate-500">
               Upload new files in the{" "}
-              <Link href="/admin/media" className="text-red-400 hover:text-red-300">
+              <Link href="/admin/media" className="text-gold-soft hover:text-gold-tint">
                 Media Library
               </Link>{" "}
               then paste their URLs here.
@@ -259,12 +259,12 @@ export default function AdminSiteImagesPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search image slots..."
-            className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-red-500 focus:outline-none"
+            className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
           />
           <select
             value={group}
             onChange={(event) => setGroup(event.target.value)}
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white focus:border-gold focus:outline-none"
           >
             {groups.map((item) => (
               <option key={item} value={item}>{item}</option>
