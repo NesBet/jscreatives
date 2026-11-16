@@ -75,8 +75,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const storedMedia = (storedImages?.images ?? []).filter(
     (image) => image.url || image.embedUrl
   );
-  const carouselItems: CarouselMedia[] =
-    storedMedia.length > 0
+  const carouselItems: CarouselMedia[] = fallback.isOverride
+    ? [
+        {
+          mediaKind: fallback.mediaKind,
+          url: fallback.url,
+          embedUrl: fallback.embedUrl,
+          altText: fallback.altText,
+        },
+      ]
+    : storedMedia.length > 0
       ? storedMedia.map((image) => ({
           id: image.id,
           mediaKind: image.mediaKind,
