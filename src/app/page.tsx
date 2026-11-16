@@ -175,6 +175,7 @@ export default async function HomePage() {
                         media={avatar}
                         sizes="36px"
                         videoControls={false}
+                        interactive={false}
                       />
                     </span>
                   ))}
@@ -366,6 +367,8 @@ export default async function HomePage() {
                     <SiteMedia
                       media={item.media}
                       sizes={index < 2 ? "(max-width: 768px) 100vw, 58vw" : "(max-width: 768px) 100vw, 33vw"}
+                      videoControls={false}
+                      interactive={false}
                       className="transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/5 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
@@ -616,6 +619,8 @@ export default async function HomePage() {
                   <SiteMedia
                     media={item.media}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                    videoControls={false}
+                    interactive={false}
                     className="transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-ink/35 opacity-0 transition-opacity duration-300 group-hover:opacity-100">

@@ -26,7 +26,12 @@ interface Product {
   category: string;
   printMethod: string;
   basePrice: number;
-  images: { url: string; altText?: string }[];
+  images: {
+    mediaKind?: string | null;
+    url: string | null;
+    embedUrl?: string | null;
+    altText?: string | null;
+  }[];
   variants: { priceOverride?: number | string | null | { toString(): string }; price?: number | string | { toString(): string } }[];
 }
 

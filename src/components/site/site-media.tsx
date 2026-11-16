@@ -8,6 +8,7 @@ interface SiteMediaProps {
   className?: string;
   priority?: boolean;
   videoControls?: boolean;
+  interactive?: boolean;
 }
 
 function canOptimize(url: string) {
@@ -31,8 +32,10 @@ export function SiteMedia({
   className,
   priority = false,
   videoControls = true,
+  interactive = true,
 }: SiteMediaProps) {
   const label = media.altText || "JsCreatives media";
+  const interactionClass = interactive ? undefined : "pointer-events-none";
 
   if (media.embedUrl) {
     return (
@@ -43,7 +46,7 @@ export function SiteMedia({
         allowFullScreen
         loading={priority ? "eager" : "lazy"}
         referrerPolicy="strict-origin-when-cross-origin"
-        className={cn("h-full w-full border-0", className)}
+        className={cn("h-full w-full border-0", interactionClass, className)}
       />
     );
   }
@@ -57,7 +60,7 @@ export function SiteMedia({
         playsInline
         preload="metadata"
         aria-label={label}
-        className={cn("h-full w-full object-cover", className)}
+        className={cn("h-full w-full object-cover", interactionClass, className)}
       >
         Your browser does not support the video tag.
       </video>

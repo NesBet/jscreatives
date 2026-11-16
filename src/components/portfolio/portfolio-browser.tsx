@@ -114,6 +114,8 @@ export function PortfolioBrowser({
                   <SiteMedia
                     media={{ ...item.media, altText: `${item.title} — ${item.client}` }}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    videoControls={false}
+                    interactive={false}
                     className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
                   />
                 ) : (

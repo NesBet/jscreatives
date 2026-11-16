@@ -32,6 +32,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             priority={priority}
             videoControls={false}
+            interactive={false}
             className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
         ) : (

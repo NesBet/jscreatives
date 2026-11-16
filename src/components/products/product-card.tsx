@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { SiteMedia } from "@/components/site/site-media";
 import { categoryLabel, printMethodLabel } from "@/constants";
 import { formatPrice } from "@/lib/utils";
 
@@ -12,7 +13,12 @@ interface ProductCardProduct {
   category: string;
   printMethod: string;
   basePrice: number | string | { toString(): string };
-  images: { url: string; altText?: string | null }[];
+  images: {
+    mediaKind?: string | null;
+    url: string | null;
+    embedUrl?: string | null;
+    altText?: string | null;
+  }[];
   variants: { priceOverride?: number | string | null | { toString(): string }; price?: number | string | { toString(): string } }[];
 }
 
@@ -39,15 +45,30 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="double-bezel rounded-2xl overflow-hidden transition-all duration-500 ease-[var(--ease-smooth)] hover:shadow-[var(--shadow-glow)] hover:border-white/15 hover:-translate-y-2">
         <div className="double-bezel-inner rounded-2xl overflow-hidden">
           <div className="relative aspect-[4/5] overflow-hidden bg-slate-900">
-            <Image
-              src={imgError ? "/jscreatives.webp" : image?.url || "/jscreatives.webp"}
-              alt={image?.altText || `${product.name} branded merchandise`}
-              fill
-              loading="lazy"
-              onError={() => setImgError(true)}
-              className="object-cover transition-transform duration-700 ease-[var(--ease-smooth)] group-hover:scale-105"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
+            {image?.embedUrl || image?.mediaKind === "VIDEO" ? (
+              <SiteMedia
+                media={{
+                  mediaKind: image.mediaKind === "VIDEO" ? "VIDEO" : "IMAGE",
+                  url: image.url,
+                  embedUrl: image.embedUrl,
+                  altText: image.altText,
+                }}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                videoControls={false}
+                interactive={false}
+                className="transition-transform duration-700 ease-[var(--ease-smooth)] group-hover:scale-105"
+              />
+            ) : (
+              <Image
+                src={imgError ? "/jscreatives.webp" : image?.url || "/jscreatives.webp"}
+                alt={image?.altText || `${product.name} branded merchandise`}
+                fill
+                loading="lazy"
+                onError={() => setImgError(true)}
+                className="object-cover transition-transform duration-700 ease-[var(--ease-smooth)] group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-70" />
             <div className="absolute left-3 top-3">
               <span className="rounded-full border border-white/10 bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
