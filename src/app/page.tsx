@@ -29,7 +29,6 @@ import { getPublishedCaseStudies } from "@/lib/case-studies";
 import { services } from "@/content/services";
 import {
   homeProcess,
-  site,
   stats,
   testimonials,
   whyChoose,
@@ -95,6 +94,7 @@ export default async function HomePage() {
     getSiteImageMap(),
     getProductMediaMap(featuredProducts.map((product) => product.slug)),
   ]);
+  const logo = resolveSiteImage(images, "brand:logo");
   const heroCollage = resolveSiteImage(images, "home:hero-collage");
   const studioImage = resolveSiteImage(images, "home:studio-image");
   const trustAvatars = [1, 2, 3].map((index) =>
@@ -143,7 +143,7 @@ export default async function HomePage() {
               aria-hidden="true"
             >
               <Image
-                src={site.logo}
+                src={logo.url}
                 alt=""
                 width={2000}
                 height={2000}

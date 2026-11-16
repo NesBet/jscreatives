@@ -25,6 +25,7 @@ interface SiteImage {
   url: string;
   embedUrl: string | null;
   altText: string;
+  imageOnly?: boolean;
   isOverride: boolean;
   updatedAt: string | null;
 }
@@ -47,20 +48,30 @@ function MediaSlot({
   onSave: (key: string, payload: MediaPayload) => Promise<boolean>;
   onReset: (key: string) => Promise<boolean>;
 }) {
-  const [draft, setDraft] = useState<MediaDraft>(() =>
-    mediaDraftFrom({
+  const [draft, setDraft] = useState<MediaDraft>(() => {
+    const next = mediaDraftFrom({
       mediaKind: image.mediaKind,
       url: image.url,
       embedUrl: image.embedUrl,
       altText: image.altText,
-    })
-  );
+    });
+    if (!image.imageOnly) return next;
+    return {
+      ...next,
+      mediaKind: "IMAGE",
+      source: next.source === "EMBED" ? "URL" : next.source,
+    };
+  });
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   const save = async () => {
     setSaving(true);
-    await onSave(image.key, mediaDraftPayload(draft));
+    const payload = mediaDraftPayload(draft);
+    await onSave(
+      image.key,
+      image.imageOnly ? { ...payload, mediaKind: "IMAGE", embed: "" } : payload
+    );
     setSaving(false);
   };
 
@@ -96,6 +107,7 @@ function MediaSlot({
         folder={folderForGroup(image.group)}
         previewClassName="aspect-[4/3]"
         compact
+        imageOnly={image.imageOnly}
       />
 
       <div className="flex flex-wrap items-center gap-1.5">

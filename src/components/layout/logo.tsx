@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useSiteLogo } from "@/components/layout/site-logo-provider";
 import { cn } from "@/lib/utils";
-import { site } from "@/content/site";
 
 interface LogoProps {
   invert?: boolean;
@@ -9,6 +11,8 @@ interface LogoProps {
 }
 
 export function Logo({ invert = false, className }: LogoProps) {
+  const logo = useSiteLogo();
+
   return (
     <Link
       href="/"
@@ -19,7 +23,7 @@ export function Logo({ invert = false, className }: LogoProps) {
       )}
     >
       <Image
-        src={site.logo}
+        src={logo.url}
         alt=""
         width={150}
         height={150}

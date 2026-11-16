@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/layout/auth-provider";
 import { CartProvider } from "@/components/layout/cart-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { SiteChrome } from "@/components/layout/site-chrome";
+import { SiteLogoProvider } from "@/components/layout/site-logo-provider";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { site } from "@/content/site";
 
@@ -131,13 +132,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
-        <AuthProvider>
-          <CartProvider>
-            <ToastProvider>
-              <SiteChrome>{children}</SiteChrome>
-            </ToastProvider>
-          </CartProvider>
-        </AuthProvider>
+        <SiteLogoProvider>
+          <AuthProvider>
+            <CartProvider>
+              <ToastProvider>
+                <SiteChrome>{children}</SiteChrome>
+              </ToastProvider>
+            </CartProvider>
+          </AuthProvider>
+        </SiteLogoProvider>
       </body>
     </html>
   );

@@ -30,6 +30,7 @@ interface MediaSourceEditorProps {
   folder?: string;
   previewClassName?: string;
   compact?: boolean;
+  imageOnly?: boolean;
 }
 
 export function MediaSourceEditor({
@@ -38,11 +39,16 @@ export function MediaSourceEditor({
   folder = "library",
   previewClassName,
   compact = false,
+  imageOnly = false,
 }: MediaSourceEditorProps) {
   const { toast } = useToast();
   const id = useId();
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const mediaKind = imageOnly ? "IMAGE" : value.mediaKind;
+  const tabs = imageOnly
+    ? sourceTabs.filter((tab) => tab.value !== "EMBED")
+    : sourceTabs;
 
   const embedResult = useMemo(
     () =>
@@ -107,7 +113,7 @@ export function MediaSourceEditor({
         </div>
       )
     ) : value.url ? (
-      value.mediaKind === "VIDEO" ? (
+      mediaKind === "VIDEO" ? (
         <video
           src={value.url}
           controls
@@ -125,12 +131,12 @@ export function MediaSourceEditor({
       )
     ) : (
       <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-slate-900 text-slate-500">
-        {value.mediaKind === "VIDEO" ? (
+        {mediaKind === "VIDEO" ? (
           <Film className="h-7 w-7" />
         ) : (
           <ImageIcon className="h-7 w-7" />
         )}
-        <span className="text-[11px]">No {value.mediaKind.toLowerCase()} selected</span>
+        <span className="text-[11px]">No {mediaKind.toLowerCase()} selected</span>
       </div>
     );
 
@@ -144,45 +150,47 @@ export function MediaSourceEditor({
       >
         {preview}
         <span className="absolute left-2 top-2 rounded bg-slate-950/80 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-200 backdrop-blur-sm">
-          {value.source === "EMBED" ? "Embed" : value.mediaKind.toLowerCase()}
+          {value.source === "EMBED" ? "Embed" : mediaKind.toLowerCase()}
         </span>
       </div>
 
       <div className={cn("space-y-3", compact ? "p-3" : "p-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div
-            className="inline-flex rounded-lg border border-slate-700 bg-slate-900 p-0.5"
-            role="group"
-            aria-label={`Media type ${id}`}
-          >
-            {(["IMAGE", "VIDEO"] as const).map((kind) => (
-              <button
-                key={kind}
-                type="button"
-                onClick={() => update({ mediaKind: kind })}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
-                  value.mediaKind === kind
-                    ? "bg-gold text-ink"
-                    : "text-slate-400 hover:text-white"
-                )}
-              >
-                {kind === "VIDEO" ? (
-                  <Film className="h-3 w-3" />
-                ) : (
-                  <ImageIcon className="h-3 w-3" />
-                )}
-                {kind === "VIDEO" ? "Video" : "Image"}
-              </button>
-            ))}
-          </div>
+          {!imageOnly && (
+            <div
+              className="inline-flex rounded-lg border border-slate-700 bg-slate-900 p-0.5"
+              role="group"
+              aria-label={`Media type ${id}`}
+            >
+              {(["IMAGE", "VIDEO"] as const).map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  onClick={() => update({ mediaKind: kind })}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
+                    value.mediaKind === kind
+                      ? "bg-gold text-ink"
+                      : "text-slate-400 hover:text-white"
+                  )}
+                >
+                  {kind === "VIDEO" ? (
+                    <Film className="h-3 w-3" />
+                  ) : (
+                    <ImageIcon className="h-3 w-3" />
+                  )}
+                  {kind === "VIDEO" ? "Video" : "Image"}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div
             className="inline-flex rounded-lg border border-slate-700 bg-slate-900 p-0.5"
             role="tablist"
             aria-label={`Media source ${id}`}
           >
-            {sourceTabs.map((tab) => {
+            {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
@@ -219,13 +227,13 @@ export function MediaSourceEditor({
               value={value.url}
               onChange={(event) => update({ url: event.target.value })}
               placeholder={
-                value.mediaKind === "VIDEO"
+                mediaKind === "VIDEO"
                   ? "https://...mp4 or /videos/file.mp4"
                   : "https://...webp, .jpg or /images/file.webp"
               }
             />
             <p className="mt-1 text-[10px] text-slate-500">
-              Use a direct public {value.mediaKind === "VIDEO" ? "video" : "image"} file URL.
+              Use a direct public {mediaKind === "VIDEO" ? "video" : "image"} file URL.
             </p>
           </div>
         )}
@@ -264,13 +272,19 @@ export function MediaSourceEditor({
             <input
               ref={fileInput}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml,video/mp4,video/webm,video/ogg,video/quicktime"
+              accept={
+                imageOnly
+                  ? "image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
+                  : "image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml,video/mp4,video/webm,video/ogg,video/quicktime"
+              }
               disabled={uploading}
               onChange={(event) => void upload(event.target.files?.[0] ?? null)}
               className="block w-full rounded-lg border border-slate-600 bg-slate-800 p-2 text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-white disabled:opacity-60"
             />
             <p className="mt-1 text-[10px] text-slate-500">
-              Images up to 10MB. Videos up to 100MB. Uploaded {value.mediaKind === "VIDEO" ? "videos" : "images"} are added to the Media Library.
+              {imageOnly
+                ? "Images up to 10MB. Uploads are added to the Media Library."
+                : `Images up to 10MB. Videos up to 100MB. Uploaded ${mediaKind === "VIDEO" ? "videos" : "images"} are added to the Media Library.`}
             </p>
             {uploading && (
               <p className="mt-2 inline-flex items-center gap-2 text-[11px] text-gold-soft">
@@ -287,7 +301,7 @@ export function MediaSourceEditor({
         )}
 
         <Input
-          label={value.mediaKind === "VIDEO" ? "Video description" : "Alt text"}
+          label={mediaKind === "VIDEO" ? "Video description" : "Alt text"}
           value={value.altText}
           onChange={(event) => update({ altText: event.target.value })}
           placeholder="Describe what the media shows"

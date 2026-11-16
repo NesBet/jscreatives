@@ -5,6 +5,7 @@ import { logAudit } from '@/lib/audit'
 import { siteImageDefinitions, siteImageDefinitionMap } from '@/content/site-images'
 import { siteImageSchema } from '@/lib/validations'
 import { prepareMediaInput } from '@/lib/media-input'
+import { isVideoUrl } from '@/lib/media-types'
 
 async function requireAdmin(request: Request) {
   const user = await getCurrentUser(request)
@@ -68,6 +69,17 @@ export async function PUT(request: Request) {
     }
     if (!prepared.data) {
       return Response.json({ error: 'Invalid media.' }, { status: 400 })
+    }
+    if (
+      definition.imageOnly &&
+      (prepared.data.mediaKind !== 'IMAGE' ||
+        prepared.data.embedUrl ||
+        isVideoUrl(prepared.data.url))
+    ) {
+      return Response.json(
+        { error: 'This media slot only accepts an image.' },
+        { status: 400 }
+      )
     }
 
     const { mediaKind, url, embedUrl, altText } = prepared.data

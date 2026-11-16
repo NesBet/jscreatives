@@ -1,6 +1,6 @@
 import { CATALOG } from "@/content/catalog";
 import { portfolioItems } from "@/content/portfolio";
-import { socialGallery } from "@/content/site";
+import { site, socialGallery } from "@/content/site";
 
 export interface SiteImageDefinition {
   key: string;
@@ -8,9 +8,18 @@ export interface SiteImageDefinition {
   group: string;
   defaultUrl: string;
   defaultAlt: string;
+  imageOnly?: boolean;
 }
 
 export const siteImageDefinitions: SiteImageDefinition[] = [
+  {
+    key: "brand:logo",
+    label: "Site logo",
+    group: "Brand",
+    defaultUrl: site.logo,
+    defaultAlt: "JsCreatives logo",
+    imageOnly: true,
+  },
   {
     key: "home:hero-collage",
     label: "Homepage hero collage",

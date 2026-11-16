@@ -10,7 +10,7 @@ import { useAuth } from '@/components/layout/auth-provider'
 import { useToast } from '@/components/ui/toast'
 import { OtpInput } from '@/components/auth/otp-input'
 import { EAST_AFRICA_COUNTRIES, buildE164 } from '@/constants/countries'
-import { site } from '@/content/site'
+import { useSiteLogo } from '@/components/layout/site-logo-provider'
 
 type Step = 'phone' | 'signup' | 'otp'
 type Mode = 'login' | 'signup'
@@ -78,6 +78,7 @@ function CountryPhoneInput({
 }
 
 export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
+  const logo = useSiteLogo()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/'
@@ -347,8 +348,8 @@ export function PhoneAuthForm({ initialStep = 'phone' }: PhoneAuthFormProps) {
             style={{ animation: 'float 6s ease-in-out infinite' }}
           >
             <Image
-              src={site.logo}
-              alt="JsCreatives"
+              src={logo.url}
+              alt={logo.alt}
               width={150}
               height={150}
               priority
