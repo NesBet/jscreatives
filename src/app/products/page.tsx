@@ -4,6 +4,10 @@ import { SiteButton } from "@/components/ui/site-button";
 import { Reveal } from "@/components/ui/reveal";
 import { CatalogBrowser } from "@/components/catalog/catalog-browser";
 import { CATALOG } from "@/content/catalog";
+import {
+  getProductMediaMap,
+  resolveProductMedia,
+} from "@/lib/product-media";
 import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
 
 export const dynamic = "force-dynamic";
@@ -34,11 +38,20 @@ const orderingSteps = [
 ];
 
 export default async function ProductsPage() {
-  const images = await getSiteImageMap();
-  const products = CATALOG.map((product) => ({
-    ...product,
-    media: resolveSiteImage(images, `product:${product.slug}:image`),
-  }));
+  const [images, productMedia] = await Promise.all([
+    getSiteImageMap(),
+    getProductMediaMap(CATALOG.map((product) => product.slug)),
+  ]);
+  const products = CATALOG.map((product) => {
+    const siteMedia = resolveSiteImage(
+      images,
+      `product:${product.slug}:image`
+    );
+    return {
+      ...product,
+      media: resolveProductMedia(siteMedia, productMedia.get(product.slug)),
+    };
+  });
 
   return (
     <>

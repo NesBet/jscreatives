@@ -20,6 +20,10 @@ import { SiteMedia } from "@/components/site/site-media";
 import { BrandingJourneys } from "@/components/portfolio/branding-journeys";
 import { CATALOG } from "@/content/catalog";
 import { portfolioItems } from "@/content/portfolio";
+import {
+  getProductMediaMap,
+  resolveProductMedia,
+} from "@/lib/product-media";
 import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
 import { getPublishedCaseStudies } from "@/lib/case-studies";
 import { services } from "@/content/services";
@@ -87,16 +91,25 @@ const disciplines = [
 ];
 
 export default async function HomePage() {
-  const images = await getSiteImageMap();
+  const [images, productMedia] = await Promise.all([
+    getSiteImageMap(),
+    getProductMediaMap(featuredProducts.map((product) => product.slug)),
+  ]);
   const heroCollage = resolveSiteImage(images, "home:hero-collage");
   const studioImage = resolveSiteImage(images, "home:studio-image");
   const trustAvatars = [1, 2, 3].map((index) =>
     resolveSiteImage(images, `home:trust-avatar-${index}`)
   );
-  const products = featuredProducts.map((product) => ({
-    ...product,
-    media: resolveSiteImage(images, `product:${product.slug}:image`),
-  }));
+  const products = featuredProducts.map((product) => {
+    const siteMedia = resolveSiteImage(
+      images,
+      `product:${product.slug}:image`
+    );
+    return {
+      ...product,
+      media: resolveProductMedia(siteMedia, productMedia.get(product.slug)),
+    };
+  });
   const work = featuredWork.map((item) => {
     const media = resolveSiteImage(images, `portfolio:${item.id}:image`);
     return { ...item, media, imageAlt: media.altText };

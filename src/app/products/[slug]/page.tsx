@@ -12,6 +12,10 @@ import { Reveal } from "@/components/ui/reveal";
 import { CATALOG, getCatalogProduct } from "@/content/catalog";
 import { categoryLabel, printMethodLabel } from "@/constants";
 import { prisma } from "@/lib/prisma";
+import {
+  getProductMediaMap,
+  resolveProductMedia,
+} from "@/lib/product-media";
 import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
 
 interface ProductPageProps {
@@ -27,10 +31,22 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const catalogProduct = getCatalogProduct(slug);
   if (!catalogProduct) return {};
 
-  const images = await getSiteImageMap();
+  const [images, productMedia] = await Promise.all([
+    getSiteImageMap(),
+    getProductMediaMap([catalogProduct.slug]),
+  ]);
+  const fallback = resolveSiteImage(
+    images,
+    `product:${catalogProduct.slug}:image`
+  );
+  const media = resolveProductMedia(
+    fallback,
+    productMedia.get(catalogProduct.slug)
+  );
   const product = {
     ...catalogProduct,
-    image: resolveSiteImage(images, `product:${catalogProduct.slug}:image`).url,
+    image:
+      media.mediaKind === "IMAGE" && media.url ? media.url : fallback.url,
   };
 
   return {
@@ -101,18 +117,27 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           },
         ];
 
+  const primaryMedia = resolveProductMedia(fallback, storedMedia[0]);
   const product = {
     ...catalogProduct,
-    image: fallback.url,
+    image:
+      primaryMedia.mediaKind === "IMAGE" && primaryMedia.url
+        ? primaryMedia.url
+        : fallback.url,
   };
-  const related = CATALOG.filter(
+  const relatedProducts = CATALOG.filter(
     (item) => item.category === product.category && item.slug !== product.slug
-  )
-    .slice(0, 4)
-    .map((item) => ({
+  ).slice(0, 4);
+  const relatedMedia = await getProductMediaMap(
+    relatedProducts.map((item) => item.slug)
+  );
+  const related = relatedProducts.map((item) => {
+    const siteMedia = resolveSiteImage(images, `product:${item.slug}:image`);
+    return {
       ...item,
-      media: resolveSiteImage(images, `product:${item.slug}:image`),
-    }));
+      media: resolveProductMedia(siteMedia, relatedMedia.get(item.slug)),
+    };
+  });
 
   const schema = {
     "@context": "https://schema.org",

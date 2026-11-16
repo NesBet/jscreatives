@@ -221,7 +221,7 @@ export function MediaSourceEditor({
               placeholder={
                 value.mediaKind === "VIDEO"
                   ? "https://...mp4 or /videos/file.mp4"
-                  : "https://...jpg or /images/file.jpg"
+                  : "https://...webp, .jpg or /images/file.webp"
               }
             />
             <p className="mt-1 text-[10px] text-slate-500">

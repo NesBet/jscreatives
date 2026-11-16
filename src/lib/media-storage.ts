@@ -14,6 +14,27 @@ const ALLOWED_VIDEO_TYPES = new Set([
   "video/ogg",
   "video/quicktime",
 ]);
+const MIME_BY_EXTENSION: Record<string, string> = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  avif: "image/avif",
+  gif: "image/gif",
+  svg: "image/svg+xml",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  ogg: "video/ogg",
+  ogv: "video/ogg",
+  mov: "video/quicktime",
+};
+const MIME_ALIASES: Record<string, string> = {
+  "image/jpg": "image/jpeg",
+  "image/pjpeg": "image/jpeg",
+  "image/x-png": "image/png",
+  "image/svg": "image/svg+xml",
+  "video/x-m4v": "video/mp4",
+};
 
 const ALLOWED_FOLDERS = new Set([
   "library",
@@ -44,9 +65,28 @@ export function isMediaStorageConfigured() {
   return Boolean(storageConfig());
 }
 
+function fileExtension(file: File) {
+  return (
+    file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || ""
+  );
+}
+
+function resolveMimeType(file: File) {
+  const declared = file.type.toLowerCase();
+  const normalized = MIME_ALIASES[declared] || declared;
+  if (
+    ALLOWED_IMAGE_TYPES.has(normalized) ||
+    ALLOWED_VIDEO_TYPES.has(normalized)
+  ) {
+    return normalized;
+  }
+  return MIME_BY_EXTENSION[fileExtension(file)] || normalized;
+}
+
 export function validateMediaFile(file: File) {
-  const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
-  const isVideo = ALLOWED_VIDEO_TYPES.has(file.type);
+  const mimeType = resolveMimeType(file);
+  const isImage = ALLOWED_IMAGE_TYPES.has(mimeType);
+  const isVideo = ALLOWED_VIDEO_TYPES.has(mimeType);
 
   if (!isImage && !isVideo) {
     return "Upload a JPG, PNG, WebP, AVIF, GIF, SVG, MP4, WebM, OGG or MOV file.";
@@ -78,10 +118,9 @@ export async function uploadMediaFile(
     );
   }
 
+  const mimeType = resolveMimeType(file) || "application/octet-stream";
   const extension =
-    file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") ||
-    file.type.split("/").pop() ||
-    "jpg";
+    fileExtension(file) || mimeType.split("/").pop() || "jpg";
   const storageKey = `${folder}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
   const body = Buffer.from(await file.arrayBuffer());
   const response = await fetch(
@@ -91,7 +130,7 @@ export async function uploadMediaFile(
       headers: {
         Authorization: `Bearer ${config.key}`,
         apikey: config.key,
-        "Content-Type": file.type,
+        "Content-Type": mimeType,
         "Cache-Control": "public, max-age=31536000, immutable",
         "x-upsert": "true",
       },
@@ -109,7 +148,7 @@ export async function uploadMediaFile(
   return {
     url: `${config.url}/storage/v1/object/public/${config.bucket}/${storageKey}`,
     storageKey,
-    mimeType: file.type,
+    mimeType,
     size: file.size,
   };
 }
