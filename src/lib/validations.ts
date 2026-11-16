@@ -63,11 +63,14 @@ export const productSchema = z.object({
   images: z
     .array(
       z.object({
-        url: z.string(),
-        altText: z.string().optional(),
-        sortOrder: z.number().optional(),
+        mediaKind: z.enum(['IMAGE', 'VIDEO']).default('IMAGE'),
+        url: z.string().max(2000).optional().or(z.literal('')),
+        embed: z.string().max(5000).optional().or(z.literal('')),
+        altText: z.string().max(300).optional().or(z.literal('')),
+        sortOrder: z.number().int().min(0).optional(),
       })
     )
+    .max(30)
     .optional(),
 })
 
@@ -159,7 +162,9 @@ export const mediaAssetSchema = z.object({
 
 export const siteImageSchema = z.object({
   key: z.string().min(1).max(160),
-  url: z.string().min(1, 'Image URL is required').max(2000),
+  mediaKind: z.enum(['IMAGE', 'VIDEO']).default('IMAGE'),
+  url: z.string().max(2000).optional().or(z.literal('')),
+  embed: z.string().max(5000).optional().or(z.literal('')),
   altText: z.string().max(300).optional().or(z.literal('')),
 })
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
+import { isVideoUrl } from "@/lib/media-types";
 
 interface MediaAsset {
   id: string;
@@ -87,7 +88,7 @@ export default function AdminMediaPage() {
   const uploadFile = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) {
-      toast("error", "Choose an image first.");
+      toast("error", "Choose an image or video first.");
       return;
     }
 
@@ -101,7 +102,7 @@ export default function AdminMediaPage() {
       const response = await fetch("/api/admin/media", { method: "POST", body });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Upload failed.");
-      toast("success", "Image uploaded.");
+      toast("success", "Media uploaded.");
       setFile(null);
       setUploadAlt("");
       setUploadCaption("");
@@ -125,8 +126,8 @@ export default function AdminMediaPage() {
         body: JSON.stringify(urlForm),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not add the image.");
-      toast("success", "Image added to the library.");
+      if (!response.ok) throw new Error(data.error || "Could not add the media.");
+      toast("success", "Media added to the library.");
       setUrlForm({ url: "", altText: "", folder: "library" });
       setPage(1);
       await fetchAssets();
@@ -147,8 +148,8 @@ export default function AdminMediaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm),
       });
-      if (!response.ok) throw new Error("Could not update the image.");
-      toast("success", "Image details updated.");
+      if (!response.ok) throw new Error("Could not update the media details.");
+      toast("success", "Media details updated.");
       setEditing(null);
       await fetchAssets();
     } catch (error) {
@@ -159,12 +160,12 @@ export default function AdminMediaPage() {
   };
 
   const deleteAsset = async (asset: MediaAsset) => {
-    if (!confirm("Delete this image from the library? This cannot be undone.")) return;
+    if (!confirm("Delete this media from the library? This cannot be undone.")) return;
     try {
       const response = await fetch(`/api/admin/media/${asset.id}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not delete the image.");
-      toast("success", "Image deleted.");
+      if (!response.ok) throw new Error(data.error || "Could not delete the media.");
+      toast("success", "Media deleted.");
       await fetchAssets();
     } catch (error) {
       toast("error", (error as Error).message);
@@ -174,7 +175,7 @@ export default function AdminMediaPage() {
   const copyUrl = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url);
-      toast("success", "Image URL copied.");
+      toast("success", "Media URL copied.");
     } catch {
       toast("error", "Could not copy the URL.");
     }
@@ -191,23 +192,24 @@ export default function AdminMediaPage() {
             onSubmit={uploadFile}
             className="rounded-xl border border-slate-700/50 bg-slate-800/50 p-5"
           >
-            <h2 className="text-sm font-semibold text-white">Upload an image</h2>
+            <h2 className="text-sm font-semibold text-white">Upload media</h2>
             <p className="mt-1 text-xs text-slate-400">
-              JPG, PNG, WebP, AVIF, GIF or SVG. Maximum 10MB.
+              JPG, PNG, WebP, AVIF, GIF, SVG, MP4, WebM, OGG or MOV. Images up to
+              10MB, videos up to 100MB.
             </p>
             {!configured && (
               <p className="mt-3 rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs leading-relaxed text-gold-tint">
                 Supabase Storage is not configured yet. Add SUPABASE_URL and a
                 server-side secret key (SUPABASE_SERVICE_ROLE_KEY or
                 SUPABASE_SECRET_KEY), then restart the server. The publishable key
-                alone cannot upload. You can still add an image by URL.
+                alone cannot upload. You can still add media by URL.
               </p>
             )}
             <div className="mt-4 space-y-3">
               <input
                 ref={fileInput}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml"
+                accept="image/jpeg,image/png,image/webp,image/avif,image/gif,image/svg+xml,video/mp4,video/webm,video/ogg,video/quicktime"
                 onChange={(event) => setFile(event.target.files?.[0] ?? null)}
                 className="block w-full rounded-lg border border-slate-600 bg-slate-800 p-2 text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-slate-700 file:px-3 file:py-1.5 file:text-xs file:text-white"
               />
@@ -228,7 +230,7 @@ export default function AdminMediaPage() {
                   label="Alt text"
                   value={uploadAlt}
                   onChange={(event) => setUploadAlt(event.target.value)}
-                  placeholder="Describe the image"
+                  placeholder="Describe the image or video"
                 />
               </div>
               <Textarea
@@ -236,11 +238,11 @@ export default function AdminMediaPage() {
                 rows={2}
                 value={uploadCaption}
                 onChange={(event) => setUploadCaption(event.target.value)}
-                placeholder="Optional caption for the image"
+                placeholder="Optional caption for the media"
               />
             </div>
             <Button variant="gold" type="submit" loading={uploading} disabled={!configured} className="mt-4">
-              Upload image
+              Upload media
             </Button>
           </form>
 
@@ -248,13 +250,13 @@ export default function AdminMediaPage() {
             onSubmit={addByUrl}
             className="rounded-xl border border-slate-700/50 bg-slate-800/50 p-5"
           >
-            <h2 className="text-sm font-semibold text-white">Add an image by URL</h2>
+            <h2 className="text-sm font-semibold text-white">Add media by URL</h2>
             <p className="mt-1 text-xs text-slate-400">
-              Use a Supabase, Cloudinary, Unsplash or other configured image host.
+              Use a public image or video URL from Supabase, Cloudinary or another host.
             </p>
             <div className="mt-4 space-y-3">
               <Input
-                label="Image URL"
+                label="Media URL"
                 type="url"
                 required
                 value={urlForm.url}
@@ -278,12 +280,12 @@ export default function AdminMediaPage() {
                   label="Alt text"
                   value={urlForm.altText}
                   onChange={(event) => setUrlForm({ ...urlForm, altText: event.target.value })}
-                  placeholder="Describe the image"
+                  placeholder="Describe the image or video"
                 />
               </div>
             </div>
             <Button type="submit" variant="secondary" loading={addingUrl} className="mt-4">
-              Add image
+              Add media
             </Button>
           </form>
         </div>
@@ -293,7 +295,7 @@ export default function AdminMediaPage() {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search images..."
+            placeholder="Search media..."
             className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
           />
           <select
@@ -325,23 +327,41 @@ export default function AdminMediaPage() {
           <p className="mt-8 text-sm text-slate-400">Loading media...</p>
         ) : assets.length === 0 ? (
           <div className="mt-8 rounded-xl border border-dashed border-slate-700 p-10 text-center text-sm text-slate-400">
-            No images yet. Upload your first image above.
+            No media yet. Upload your first image or video above.
           </div>
         ) : (
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {assets.map((asset) => (
+            {assets.map((asset) => {
+              const video = Boolean(
+                asset.mimeType?.startsWith("video/") || isVideoUrl(asset.url)
+              );
+              return (
               <article
                 key={asset.id}
                 className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-800/60"
               >
                 <div className="relative aspect-[4/3] bg-slate-900">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={asset.url}
-                    alt={asset.altText || ""}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
+                  {video ? (
+                    <video
+                      src={asset.url}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="h-full w-full object-cover"
+                      aria-label={asset.altText || "Uploaded video"}
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={asset.url}
+                      alt={asset.altText || ""}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+                  <span className="absolute left-2 top-2 rounded bg-slate-950/80 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-200 backdrop-blur-sm">
+                    {video ? "Video" : "Image"}
+                  </span>
                 </div>
                 <div className="p-3">
                   <p className="truncate text-xs text-slate-300">
@@ -381,7 +401,8 @@ export default function AdminMediaPage() {
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         )}
 
@@ -405,7 +426,7 @@ export default function AdminMediaPage() {
             onSubmit={saveAsset}
             className="w-full max-w-lg rounded-xl border border-slate-700 bg-slate-800 p-6"
           >
-            <h2 className="text-lg font-semibold text-white">Edit image details</h2>
+            <h2 className="text-lg font-semibold text-white">Edit media details</h2>
             <div className="mt-4 space-y-3">
               <Input
                 label="Alt text"

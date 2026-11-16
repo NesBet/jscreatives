@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/site/product-card";
 import type { CatalogProduct } from "@/content/catalog";
+import type { MediaValue } from "@/lib/media-types";
 import {
   CATEGORY_DESCRIPTIONS,
   CATEGORY_LABELS,
@@ -13,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface CatalogBrowserProps {
-  products: CatalogProduct[];
+  products: (CatalogProduct & { media?: MediaValue })[];
 }
 
 export function CatalogBrowser({ products }: CatalogBrowserProps) {

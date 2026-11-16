@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check, PackageCheck, ShieldCheck, Timer } from "lucide-react";
 import { ProductQuotePanel } from "@/components/products/product-quote-panel";
+import {
+  ImageCarousel,
+  type CarouselMedia,
+} from "@/components/products/image-carousel";
 import { ProductCard } from "@/components/site/product-card";
 import { Reveal } from "@/components/ui/reveal";
 import { CATALOG, getCatalogProduct } from "@/content/catalog";
 import { categoryLabel, printMethodLabel } from "@/constants";
+import { prisma } from "@/lib/prisma";
 import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
 
 interface ProductPageProps {
@@ -49,9 +53,49 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   if (!catalogProduct) notFound();
 
   const images = await getSiteImageMap();
+  const fallback = resolveSiteImage(images, `product:${catalogProduct.slug}:image`);
+  const storedImages = await prisma.product
+    .findUnique({
+      where: { slug },
+      select: {
+        images: {
+          orderBy: { sortOrder: "asc" },
+          select: {
+            id: true,
+            mediaKind: true,
+            url: true,
+            embedUrl: true,
+            altText: true,
+          },
+        },
+      },
+    })
+    .catch(() => null);
+
+  const storedMedia = (storedImages?.images ?? []).filter(
+    (image) => image.url || image.embedUrl
+  );
+  const carouselItems: CarouselMedia[] =
+    storedMedia.length > 0
+      ? storedMedia.map((image) => ({
+          id: image.id,
+          mediaKind: image.mediaKind,
+          url: image.url,
+          embedUrl: image.embedUrl,
+          altText: image.altText || catalogProduct.name,
+        }))
+      : [
+          {
+            mediaKind: fallback.mediaKind,
+            url: fallback.url,
+            embedUrl: fallback.embedUrl,
+            altText: fallback.altText,
+          },
+        ];
+
   const product = {
     ...catalogProduct,
-    image: resolveSiteImage(images, `product:${catalogProduct.slug}:image`).url,
+    image: fallback.url,
   };
   const related = CATALOG.filter(
     (item) => item.category === product.category && item.slug !== product.slug
@@ -59,7 +103,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     .slice(0, 4)
     .map((item) => ({
       ...item,
-      image: resolveSiteImage(images, `product:${item.slug}:image`).url,
+      media: resolveSiteImage(images, `product:${item.slug}:image`),
     }));
 
   const schema = {
@@ -109,16 +153,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
         <div className="container-wide grid gap-10 pb-14 pt-8 lg:grid-cols-12 lg:gap-14 lg:pb-20 lg:pt-10">
           <div className="lg:col-span-6">
-            <div className="relative aspect-square overflow-hidden bg-charcoal lg:sticky lg:top-28">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-              <span className="absolute left-4 top-4 bg-paper/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
+            <div className="relative lg:sticky lg:top-28">
+              <ImageCarousel items={carouselItems} />
+              <span className="pointer-events-none absolute left-4 top-4 bg-paper/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
                 {categoryLabel(product.category)}
               </span>
             </div>

@@ -21,7 +21,7 @@ export default async function PortfolioPage() {
   const hero = resolveSiteImage(images, "portfolio:hero");
   const items = portfolioItems.map((item) => ({
     ...item,
-    image: resolveSiteImage(images, `portfolio:${item.id}:image`).url,
+    media: resolveSiteImage(images, `portfolio:${item.id}:image`),
   }));
   const stories = await getPublishedCaseStudies({ limit: 6 });
 
@@ -43,8 +43,7 @@ export default async function PortfolioPage() {
             from the studio.
           </p>
         }
-        image={hero.url}
-        imageAlt={hero.altText}
+        media={hero}
       >
         <SiteButton href="/quote" variant="ink">
           Start a project

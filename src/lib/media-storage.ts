@@ -1,11 +1,18 @@
-const MAX_MEDIA_BYTES = 10 * 1024 * 1024;
-const ALLOWED_MEDIA_TYPES = new Set([
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/avif",
   "image/gif",
   "image/svg+xml",
+]);
+const ALLOWED_VIDEO_TYPES = new Set([
+  "video/mp4",
+  "video/webm",
+  "video/ogg",
+  "video/quicktime",
 ]);
 
 const ALLOWED_FOLDERS = new Set([
@@ -38,14 +45,20 @@ export function isMediaStorageConfigured() {
 }
 
 export function validateMediaFile(file: File) {
-  if (!ALLOWED_MEDIA_TYPES.has(file.type)) {
-    return "Upload a JPG, PNG, WebP, AVIF, GIF or SVG image.";
+  const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
+  const isVideo = ALLOWED_VIDEO_TYPES.has(file.type);
+
+  if (!isImage && !isVideo) {
+    return "Upload a JPG, PNG, WebP, AVIF, GIF, SVG, MP4, WebM, OGG or MOV file.";
   }
-  if (file.size > MAX_MEDIA_BYTES) {
+  if (isImage && file.size > MAX_IMAGE_BYTES) {
     return "Images must be 10MB or smaller.";
   }
+  if (isVideo && file.size > MAX_VIDEO_BYTES) {
+    return "Videos must be 100MB or smaller.";
+  }
   if (file.size === 0) {
-    return "The selected image is empty.";
+    return "The selected file is empty.";
   }
   return null;
 }

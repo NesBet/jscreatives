@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { SiteMedia } from "@/components/site/site-media";
 import type { CatalogProduct } from "@/content/catalog";
 import { categoryLabel } from "@/constants";
+import type { MediaValue } from "@/lib/media-types";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
-  product: CatalogProduct;
+  product: CatalogProduct & { media?: MediaValue };
   className?: string;
   priority?: boolean;
 }
@@ -24,14 +26,24 @@ export function ProductCard({ product, className, priority = false }: ProductCar
       aria-label={`${product.name} — ${price}`}
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-paper-deep">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          priority={priority}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
-        />
+        {product.media ? (
+          <SiteMedia
+            media={{ ...product.media, altText: product.name }}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            priority={priority}
+            videoControls={false}
+            className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          />
+        ) : (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            priority={priority}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+          />
+        )}
         {product.featured && (
           <span className="absolute left-3 top-3 bg-paper/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-ink backdrop-blur-sm">
             Studio pick

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { productSchema } from '@/lib/validations'
 import { logAudit } from '@/lib/audit'
+import { prepareMediaInput, type PreparedMedia } from '@/lib/media-input'
 
 export async function GET(
   request: Request,
@@ -60,6 +61,18 @@ export async function PUT(
     }
 
     const { variants, images, ...productData } = parsed.data
+    const preparedImages: PreparedMedia[] = []
+
+    for (const [index, image] of (images ?? []).entries()) {
+      const prepared = prepareMediaInput(image, index)
+      if (prepared.error) {
+        return Response.json({ error: prepared.error }, { status: 400 })
+      }
+      if (!prepared.data) {
+        return Response.json({ error: 'Invalid media.' }, { status: 400 })
+      }
+      preparedImages.push(prepared.data)
+    }
 
     const product = await prisma.$transaction(async (tx) => {
       await tx.product.update({
@@ -84,13 +97,15 @@ export async function PUT(
 
       if (images) {
         await tx.productImage.deleteMany({ where: { productId: id } })
-        if (images.length > 0) {
+        if (preparedImages.length > 0) {
           await tx.productImage.createMany({
-            data: images.map((img: { url: string; altText?: string; sortOrder?: number }, index: number) => ({
+            data: preparedImages.map((image) => ({
               productId: id,
-              url: img.url,
-              altText: img.altText || null,
-              sortOrder: img.sortOrder ?? index,
+              mediaKind: image.mediaKind,
+              url: image.url,
+              embedUrl: image.embedUrl,
+              altText: image.altText,
+              sortOrder: image.sortOrder,
             })),
           })
         }

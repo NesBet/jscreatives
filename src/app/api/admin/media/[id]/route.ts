@@ -46,17 +46,18 @@ export async function DELETE(request: Request, { params }: RouteContext) {
       return Response.json({ error: 'Image not found.' }, { status: 404 })
     }
 
-    const [siteImages, covers, galleryImages] = await Promise.all([
+    const [siteImages, productImages, covers, galleryImages] = await Promise.all([
       prisma.siteImage.count({ where: { url: asset.url } }),
+      prisma.productImage.count({ where: { url: asset.url } }),
       prisma.caseStudy.count({ where: { coverUrl: asset.url } }),
       prisma.caseStudyImage.count({ where: { url: asset.url } }),
     ])
 
-    if (siteImages + covers + galleryImages > 0) {
+    if (siteImages + productImages + covers + galleryImages > 0) {
       return Response.json(
         {
           error:
-            'This image is currently used on the website. Replace its usage before deleting it.',
+            'This media is currently used on the website. Replace its usage before deleting it.',
         },
         { status: 409 }
       )

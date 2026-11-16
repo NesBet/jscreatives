@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { MediaSourceEditor } from "@/components/admin/media-source-editor";
 import { formatPrice } from "@/lib/utils";
+import {
+  mediaDraftFrom,
+  mediaDraftPayload,
+  type MediaDraft,
+  type MediaKindValue,
+} from "@/lib/media-types";
 import {
   CATEGORY_LABELS,
   PRINT_METHODS,
@@ -26,6 +33,15 @@ interface ProductVariant {
   priceOverride: number | null;
 }
 
+interface ProductImage {
+  id: string;
+  mediaKind: MediaKindValue;
+  url: string | null;
+  embedUrl: string | null;
+  altText: string | null;
+  sortOrder: number;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -38,6 +54,7 @@ interface Product {
   basePrice: number;
   active: boolean;
   featured: boolean;
+  images: ProductImage[];
   variants: ProductVariant[];
 }
 
@@ -47,6 +64,14 @@ interface VariantForm {
   stock: string;
   priceOverride: string;
 }
+
+const emptyMediaDraft = (): MediaDraft => ({
+  mediaKind: "IMAGE",
+  source: "URL",
+  url: "",
+  embed: "",
+  altText: "",
+});
 
 const emptyForm = () => ({
   name: "",
@@ -59,6 +84,7 @@ const emptyForm = () => ({
   basePrice: 0,
   active: true,
   featured: false,
+  images: [] as MediaDraft[],
   variants: [{ option: "", sku: "", stock: "", priceOverride: "" }],
 });
 
@@ -124,6 +150,14 @@ export default function AdminProductsPage() {
       basePrice: Number(product.basePrice),
       active: product.active,
       featured: product.featured,
+      images: product.images.map((image) =>
+        mediaDraftFrom({
+          mediaKind: image.mediaKind,
+          url: image.url,
+          embedUrl: image.embedUrl,
+          altText: image.altText,
+        })
+      ),
       variants:
         product.variants.length > 0
           ? product.variants.map((v) => ({
@@ -171,6 +205,24 @@ export default function AdminProductsPage() {
           if (v.priceOverride.trim()) out.priceOverride = Number(v.priceOverride);
           return out;
         });
+
+      const images: ReturnType<typeof mediaDraftPayload>[] = [];
+      for (const [index, image] of form.images.entries()) {
+        const payload = mediaDraftPayload(image);
+        if (!payload.url && !payload.embed) {
+          if (image.altText.trim()) {
+            toast(
+              "error",
+              `Media ${index + 1} needs a URL, an embed or an uploaded file.`
+            );
+            setSubmitting(false);
+            return;
+          }
+          continue;
+        }
+        images.push(payload);
+      }
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -185,6 +237,7 @@ export default function AdminProductsPage() {
           basePrice: Number(form.basePrice),
           active: form.active,
           featured: form.featured,
+          images,
           variants,
         }),
       });
@@ -219,6 +272,31 @@ export default function AdminProductsPage() {
 
   const removeVariant = (idx: number) => {
     setForm((f) => ({ ...f, variants: f.variants.filter((_, i) => i !== idx) }));
+  };
+
+  const addImage = () => {
+    setForm((f) => ({ ...f, images: [...f.images, emptyMediaDraft()] }));
+  };
+
+  const updateImage = (idx: number, image: MediaDraft) => {
+    setForm((f) => ({
+      ...f,
+      images: f.images.map((item, index) => (index === idx ? image : item)),
+    }));
+  };
+
+  const removeImage = (idx: number) => {
+    setForm((f) => ({ ...f, images: f.images.filter((_, index) => index !== idx) }));
+  };
+
+  const moveImage = (idx: number, direction: -1 | 1) => {
+    setForm((f) => {
+      const next = [...f.images];
+      const target = idx + direction;
+      if (target < 0 || target >= next.length) return f;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return { ...f, images: next };
+    });
   };
 
   if (authLoading || !user) return null;
@@ -324,7 +402,7 @@ export default function AdminProductsPage() {
 
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 p-6">
+            <div className="mx-4 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-slate-900 border border-slate-700 p-6">
               <h2 className="mb-4 text-lg font-semibold text-white">
                 {editingProduct ? "Edit Product" : "Create Product"}
               </h2>
@@ -425,6 +503,76 @@ export default function AdminProductsPage() {
                     Featured
                   </label>
                 </div>
+                <div className="border-t border-slate-700 pt-4">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span className="text-sm font-medium text-slate-300">
+                        Product media
+                      </span>
+                      <p className="mt-0.5 text-[11px] text-slate-500">
+                        Add images or videos by URL, embed or upload. Multiple items
+                        appear as a carousel on the product page.
+                      </p>
+                    </div>
+                    <Button type="button" variant="secondary" size="sm" onClick={addImage}>
+                      + Add media
+                    </Button>
+                  </div>
+                  {form.images.length === 0 && (
+                    <p className="rounded-lg border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                      No media yet. Add at least one image so clients can see the product.
+                    </p>
+                  )}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {form.images.map((image, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-xl border border-slate-700 bg-slate-800/40 p-2.5"
+                      >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <span className="text-xs font-semibold text-slate-300">
+                            Media {idx + 1}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={idx === 0}
+                              onClick={() => moveImage(idx, -1)}
+                              className="rounded px-1.5 py-1 text-[11px] text-slate-400 hover:bg-slate-700 hover:text-white disabled:opacity-30"
+                              aria-label={`Move media ${idx + 1} up`}
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              disabled={idx === form.images.length - 1}
+                              onClick={() => moveImage(idx, 1)}
+                              className="rounded px-1.5 py-1 text-[11px] text-slate-400 hover:bg-slate-700 hover:text-white disabled:opacity-30"
+                              aria-label={`Move media ${idx + 1} down`}
+                            >
+                              ↓
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx)}
+                              className="rounded px-1.5 py-1 text-[11px] text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                        <MediaSourceEditor
+                          value={image}
+                          onChange={(next) => updateImage(idx, next)}
+                          folder="products"
+                          previewClassName="aspect-square"
+                          compact
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="border-t border-slate-700 pt-4">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-sm font-medium text-slate-300">

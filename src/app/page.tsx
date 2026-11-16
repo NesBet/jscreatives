@@ -16,6 +16,7 @@ import { SiteButton } from "@/components/ui/site-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { ProductCard } from "@/components/site/product-card";
+import { SiteMedia } from "@/components/site/site-media";
 import { BrandingJourneys } from "@/components/portfolio/branding-journeys";
 import { CATALOG } from "@/content/catalog";
 import { portfolioItems } from "@/content/portfolio";
@@ -94,15 +95,15 @@ export default async function HomePage() {
   );
   const products = featuredProducts.map((product) => ({
     ...product,
-    image: resolveSiteImage(images, `product:${product.slug}:image`).url,
+    media: resolveSiteImage(images, `product:${product.slug}:image`),
   }));
   const work = featuredWork.map((item) => {
-    const image = resolveSiteImage(images, `portfolio:${item.id}:image`);
-    return { ...item, image: image.url, imageAlt: image.altText };
+    const media = resolveSiteImage(images, `portfolio:${item.id}:image`);
+    return { ...item, media, imageAlt: media.altText };
   });
   const gallery = socialGallery.map((item, index) => {
-    const image = resolveSiteImage(images, `gallery:${index + 1}:image`);
-    return { ...item, image: image.url, altText: image.altText };
+    const media = resolveSiteImage(images, `gallery:${index + 1}:image`);
+    return { ...item, media, altText: media.altText };
   });
   const stories = await getPublishedCaseStudies({ limit: 3, featuredOnly: true });
 
@@ -167,15 +168,13 @@ export default async function HomePage() {
                 <div className="flex -space-x-2">
                   {trustAvatars.map((avatar) => (
                     <span
-                      key={avatar.url}
+                      key={avatar.key}
                       className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-paper"
                     >
-                      <Image
-                        src={avatar.url}
-                        alt={avatar.altText}
-                        fill
+                      <SiteMedia
+                        media={avatar}
                         sizes="36px"
-                        className="object-cover"
+                        videoControls={false}
                       />
                     </span>
                   ))}
@@ -190,13 +189,11 @@ export default async function HomePage() {
 
             <div className="lg:col-span-8">
               <div className="group relative aspect-[16/10] overflow-hidden bg-charcoal">
-                <Image
-                  src={heroCollage.url}
-                  alt={heroCollage.altText}
-                  fill
+                <SiteMedia
+                  media={heroCollage}
                   priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
-                  className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
+                  className="transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
                 />
                 <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent p-5 sm:p-7">
                   <p className="max-w-xs text-[10px] font-semibold uppercase leading-relaxed tracking-[0.16em] text-paper/80">
@@ -366,12 +363,10 @@ export default async function HomePage() {
                     href="/portfolio"
                     className={`group relative block overflow-hidden bg-charcoal ${spans[index] ?? "aspect-[4/5]"}`}
                   >
-                    <Image
-                      src={item.image}
-                      alt={item.imageAlt}
-                      fill
+                    <SiteMedia
+                      media={item.media}
                       sizes={index < 2 ? "(max-width: 768px) 100vw, 58vw" : "(max-width: 768px) 100vw, 33vw"}
-                      className="object-cover transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                      className="transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/5 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
                     <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
@@ -452,12 +447,9 @@ export default async function HomePage() {
         <div className="container-wide relative z-10 grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden">
-              <Image
-                src={studioImage.url}
-                alt={studioImage.altText}
-                fill
+              <SiteMedia
+                media={studioImage}
                 sizes="(max-width: 1024px) 100vw, 42vw"
-                className="object-cover"
               />
               <div className="absolute inset-0 ring-1 ring-inset ring-paper/10" />
               <div className="absolute bottom-4 left-4 bg-paper/95 px-4 py-3 text-ink">
@@ -621,12 +613,10 @@ export default async function HomePage() {
                   className="group relative block aspect-square overflow-hidden bg-charcoal"
                   aria-label={item.caption}
                 >
-                  <Image
-                    src={item.image}
-                    alt={item.altText}
-                    fill
+                  <SiteMedia
+                    media={item.media}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-ink/35 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <span className="flex h-10 w-10 items-center justify-center border border-paper/40 text-paper">

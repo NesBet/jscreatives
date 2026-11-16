@@ -5,9 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/layout/auth-provider";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { MediaSourceEditor } from "@/components/admin/media-source-editor";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
+import {
+  mediaDraftFrom,
+  mediaDraftPayload,
+  type MediaDraft,
+  type MediaKindValue,
+} from "@/lib/media-types";
 
 interface SiteImage {
   key: string;
@@ -15,60 +21,66 @@ interface SiteImage {
   group: string;
   defaultUrl: string;
   defaultAlt: string;
+  mediaKind: MediaKindValue;
   url: string;
+  embedUrl: string | null;
   altText: string;
   isOverride: boolean;
   updatedAt: string | null;
 }
 
-function ImageSlot({
+type MediaPayload = ReturnType<typeof mediaDraftPayload>;
+
+function folderForGroup(group: string) {
+  if (group === "Products") return "products";
+  if (group === "Portfolio") return "portfolio";
+  if (group === "Homepage") return "homepage";
+  return "library";
+}
+
+function MediaSlot({
   image,
   onSave,
   onReset,
 }: {
   image: SiteImage;
-  onSave: (key: string, url: string, altText: string) => Promise<boolean>;
+  onSave: (key: string, payload: MediaPayload) => Promise<boolean>;
   onReset: (key: string) => Promise<boolean>;
 }) {
-  const [url, setUrl] = useState(image.url);
-  const [altText, setAltText] = useState(image.altText);
+  const [draft, setDraft] = useState<MediaDraft>(() =>
+    mediaDraftFrom({
+      mediaKind: image.mediaKind,
+      url: image.url,
+      embedUrl: image.embedUrl,
+      altText: image.altText,
+    })
+  );
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setUrl(image.url);
-    setAltText(image.altText);
-  }, [image.url, image.altText]);
-
   const save = async () => {
     setSaving(true);
-    await onSave(image.key, url.trim(), altText.trim());
+    await onSave(image.key, mediaDraftPayload(draft));
     setSaving(false);
   };
 
   const reset = async () => {
     setResetting(true);
-    const resetDone = await onReset(image.key);
-    if (resetDone) {
-      setUrl(image.defaultUrl);
-      setAltText(image.defaultAlt);
-    }
+    await onReset(image.key);
     setResetting(false);
   };
 
   return (
-    <article className="overflow-hidden rounded-xl border border-slate-700/60 bg-slate-800/60">
-      <div className="relative aspect-[4/3] bg-slate-900">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={url || image.defaultUrl}
-          alt={altText || image.defaultAlt}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+    <article className="space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-semibold text-white">{image.label}</p>
+          <p className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-500">
+            {image.group}
+          </p>
+        </div>
         <span
-          className={`absolute left-2 top-2 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+          className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
             image.isOverride
               ? "bg-gold text-ink"
               : "bg-slate-900/80 text-slate-300"
@@ -77,47 +89,36 @@ function ImageSlot({
           {image.isOverride ? "Updated" : "Default"}
         </span>
       </div>
-      <div className="space-y-2.5 p-3">
-        <div>
-          <p className="text-xs font-semibold text-white">{image.label}</p>
-          <p className="mt-0.5 text-[10px] uppercase tracking-wider text-slate-500">
-            {image.group}
-          </p>
-        </div>
-        <Input
-          aria-label={`Image URL for ${image.label}`}
-          value={url}
-          onChange={(event) => setUrl(event.target.value)}
-          placeholder="Image URL"
-        />
-        <Input
-          aria-label={`Alt text for ${image.label}`}
-          value={altText}
-          onChange={(event) => setAltText(event.target.value)}
-          placeholder="Alt text"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          <Button type="button" size="sm" variant="gold" loading={saving} onClick={save}>
-            Save
-          </Button>
-          {image.isOverride && (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              loading={resetting}
-              onClick={reset}
-            >
-              Reset
-            </Button>
-          )}
-          <Link
-            href="/admin/media"
-            className="inline-flex h-8 items-center rounded-lg px-3 text-sm text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+
+      <MediaSourceEditor
+        value={draft}
+        onChange={setDraft}
+        folder={folderForGroup(image.group)}
+        previewClassName="aspect-[4/3]"
+        compact
+      />
+
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Button type="button" size="sm" variant="gold" loading={saving} onClick={save}>
+          Save
+        </Button>
+        {image.isOverride && (
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            loading={resetting}
+            onClick={reset}
           >
-            Library
-          </Link>
-        </div>
+            Reset to default
+          </Button>
+        )}
+        <Link
+          href="/admin/media"
+          className="inline-flex h-8 items-center rounded-lg px-3 text-sm text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+        >
+          Library
+        </Link>
       </div>
     </article>
   );
@@ -140,7 +141,7 @@ export default function AdminSiteImagesPage() {
   const fetchImages = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/site-images");
-      if (!response.ok) throw new Error("Could not load website images.");
+      if (!response.ok) throw new Error("Could not load website media.");
       const data = await response.json();
       setImages(data.images);
     } catch (error) {
@@ -171,23 +172,19 @@ export default function AdminSiteImagesPage() {
     });
   }, [images, group, search]);
 
-  const saveImage = async (key: string, url: string, altText: string) => {
+  const saveImage = async (key: string, payload: MediaPayload) => {
     try {
       const response = await fetch("/api/admin/site-images", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, url, altText }),
+        body: JSON.stringify({ key, ...payload }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not update the image.");
+      if (!response.ok) throw new Error(data.error || "Could not update the media.");
       setImages((current) =>
-        current.map((image) =>
-          image.key === key
-            ? { ...image, url, altText, isOverride: true, updatedAt: new Date().toISOString() }
-            : image
-        )
+        current.map((image) => (image.key === key ? data.image : image))
       );
-      toast("success", "Website image updated.");
+      toast("success", "Website media updated.");
       return true;
     } catch (error) {
       toast("error", (error as Error).message);
@@ -202,14 +199,16 @@ export default function AdminSiteImagesPage() {
         { method: "DELETE" }
       );
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Could not reset the image.");
+      if (!response.ok) throw new Error(data.error || "Could not reset the media.");
       const original = images.find((image) => image.key === key);
       setImages((current) =>
         current.map((image) =>
           image.key === key
             ? {
                 ...image,
+                mediaKind: "IMAGE",
                 url: image.defaultUrl,
+                embedUrl: null,
                 altText: image.defaultAlt,
                 isOverride: false,
                 updatedAt: null,
@@ -217,7 +216,7 @@ export default function AdminSiteImagesPage() {
             : image
         )
       );
-      toast("success", `Reverted ${original?.label || "image"} to the default.`);
+      toast("success", `Reverted ${original?.label || "media"} to the default.`);
       return true;
     } catch (error) {
       toast("error", (error as Error).message);
@@ -229,20 +228,20 @@ export default function AdminSiteImagesPage() {
 
   return (
     <>
-      <AdminHeader title="Website Images" />
+      <AdminHeader title="Website Media" />
       <div className="p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-slate-300">
-              Replace the homepage collage, product photography, portfolio images
-              and studio gallery without changing code.
+              Replace homepage artwork, product photography, portfolio media and
+              the studio gallery with an image, a video, an embed or an upload.
             </p>
             <p className="mt-1 text-xs text-slate-500">
-              Upload new files in the{" "}
+              Each slot uses one source at a time. Uploads are stored in the{" "}
               <Link href="/admin/media" className="text-gold-soft hover:text-gold-tint">
                 Media Library
-              </Link>{" "}
-              then paste their URLs here.
+              </Link>
+              .
             </p>
           </div>
           <Link
@@ -258,7 +257,7 @@ export default function AdminSiteImagesPage() {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search image slots..."
+            placeholder="Search media slots..."
             className="min-w-56 flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-gold focus:outline-none"
           />
           <select
@@ -277,12 +276,12 @@ export default function AdminSiteImagesPage() {
         </div>
 
         {loading ? (
-          <p className="mt-8 text-sm text-slate-400">Loading image slots...</p>
+          <p className="mt-8 text-sm text-slate-400">Loading media slots...</p>
         ) : (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {filtered.map((image) => (
-              <ImageSlot
-                key={image.key}
+              <MediaSlot
+                key={`${image.key}:${image.updatedAt ?? "default"}`}
                 image={image}
                 onSave={saveImage}
                 onReset={resetImage}

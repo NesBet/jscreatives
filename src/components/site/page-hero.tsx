@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { SiteMedia } from "@/components/site/site-media";
+import type { MediaValue } from "@/lib/media-types";
 import { cn } from "@/lib/utils";
 
 interface PageHeroProps {
@@ -7,6 +9,7 @@ interface PageHeroProps {
   description: React.ReactNode;
   image?: string;
   imageAlt?: string;
+  media?: MediaValue;
   imageClassName?: string;
   children?: React.ReactNode;
   aside?: React.ReactNode;
@@ -19,11 +22,14 @@ export function PageHero({
   description,
   image,
   imageAlt = "",
+  media,
   imageClassName,
   children,
   aside,
   className,
 }: PageHeroProps) {
+  const hasMedia = Boolean(media || image);
+
   return (
     <section className={cn("relative overflow-hidden border-b border-line", className)}>
       <div className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-gold/6 blur-3xl" aria-hidden="true" />
@@ -36,8 +42,8 @@ export function PageHero({
           <span className="hidden text-stone/70 sm:block">Nairobi · Kenya</span>
         </div>
 
-        <div className={cn("mt-10 grid gap-10 lg:mt-14", image ? "lg:grid-cols-12 lg:gap-12" : "")}>
-          <div className={cn(image ? "lg:col-span-7" : "max-w-4xl")}>
+        <div className={cn("mt-10 grid gap-10 lg:mt-14", hasMedia ? "lg:grid-cols-12 lg:gap-12" : "")}>
+          <div className={cn(hasMedia ? "lg:col-span-7" : "max-w-4xl")}>
             <h1 className="display-title text-balance text-ink">{title}</h1>
             <div className="mt-7 max-w-2xl text-[15px] leading-[1.8] text-stone">
               {description}
@@ -46,18 +52,26 @@ export function PageHero({
             {aside}
           </div>
 
-          {image && (
+          {hasMedia && (
             <div className="lg:col-span-5">
               <div className={cn("relative aspect-[4/5] overflow-hidden bg-charcoal", imageClassName)}>
-                <Image
-                  src={image}
-                  alt={imageAlt}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 ring-1 ring-inset ring-ink/10" />
+                {media ? (
+                  <SiteMedia
+                    media={media}
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    priority
+                  />
+                ) : image ? (
+                  <Image
+                    src={image}
+                    alt={imageAlt}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                ) : null}
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-ink/10" />
               </div>
             </div>
           )}

@@ -37,7 +37,7 @@ export default async function ProductsPage() {
   const images = await getSiteImageMap();
   const products = CATALOG.map((product) => ({
     ...product,
-    image: resolveSiteImage(images, `product:${product.slug}:image`).url,
+    media: resolveSiteImage(images, `product:${product.slug}:image`),
   }));
 
   return (

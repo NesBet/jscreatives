@@ -10,7 +10,11 @@ import {
   type PortfolioCategory,
   type PortfolioItem,
 } from "@/content/portfolio";
+import { SiteMedia } from "@/components/site/site-media";
+import type { MediaValue } from "@/lib/media-types";
 import { cn } from "@/lib/utils";
+
+type BrowserItem = PortfolioItem & { media?: MediaValue };
 
 const aspectClass: Record<NonNullable<PortfolioItem["size"]>, string> = {
   wide: "aspect-[4/3]",
@@ -21,10 +25,10 @@ const aspectClass: Record<NonNullable<PortfolioItem["size"]>, string> = {
 export function PortfolioBrowser({
   items = portfolioItems,
 }: {
-  items?: PortfolioItem[];
+  items?: BrowserItem[];
 }) {
   const [category, setCategory] = useState<PortfolioCategory | "All">("All");
-  const [selected, setSelected] = useState<PortfolioItem | null>(null);
+  const [selected, setSelected] = useState<BrowserItem | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -106,13 +110,21 @@ export function PortfolioBrowser({
                   aspectClass[item.size ?? "normal"]
                 )}
               >
-                <Image
-                  src={item.image}
-                  alt={`${item.title} — ${item.client}`}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
-                />
+                {item.media ? (
+                  <SiteMedia
+                    media={{ ...item.media, altText: `${item.title} — ${item.client}` }}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+                  />
+                ) : (
+                  <Image
+                    src={item.image}
+                    alt={`${item.title} — ${item.client}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-90" />
                 <span className="absolute left-3 top-3 bg-paper/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-ink">
                   {item.category}
@@ -159,13 +171,23 @@ export function PortfolioBrowser({
 
             <div className="grid lg:grid-cols-2">
               <div className="relative aspect-square bg-charcoal">
-                <Image
-                  src={selected.image}
-                  alt={`${selected.title} — ${selected.client}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
+                {selected.media ? (
+                  <SiteMedia
+                    media={{
+                      ...selected.media,
+                      altText: `${selected.title} — ${selected.client}`,
+                    }}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                ) : (
+                  <Image
+                    src={selected.image}
+                    alt={`${selected.title} — ${selected.client}`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                )}
               </div>
               <div className="p-6 sm:p-9 lg:p-10">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.19em] text-gold-deep">

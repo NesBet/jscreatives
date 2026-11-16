@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       const file = formData.get('file')
 
       if (!(file instanceof File)) {
-        return Response.json({ error: 'Choose an image to upload.' }, { status: 400 })
+        return Response.json({ error: 'Choose an image or video to upload.' }, { status: 400 })
       }
 
       const fileError = validateMediaFile(file)
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         return Response.json(
           {
             error:
-              'Media storage is not configured. Add SUPABASE_URL and a server-side secret key (SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY), plus SUPABASE_STORAGE_BUCKET. The publishable key cannot upload on its own. You can also add an image by URL.',
+                'Media storage is not configured. Add SUPABASE_URL and a server-side secret key (SUPABASE_SERVICE_ROLE_KEY or SUPABASE_SECRET_KEY), plus SUPABASE_STORAGE_BUCKET. The publishable key cannot upload on its own. You can also add media by URL.',
           },
           { status: 503 }
         )
