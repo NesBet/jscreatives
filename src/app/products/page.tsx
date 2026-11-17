@@ -42,6 +42,7 @@ export default async function ProductsPage() {
     getSiteImageMap(),
     getProductMediaMap(CATALOG.map((product) => product.slug)),
   ]);
+  const hero = resolveSiteImage(images, "products:hero");
   const products = CATALOG.map((product) => {
     const siteMedia = resolveSiteImage(
       images,
@@ -71,8 +72,7 @@ export default async function ProductsPage() {
             your artwork, colours and details.
           </p>
         }
-        image="/images/brand/merch-box.jpg"
-        imageAlt="A branded corporate gift box produced by JsCreatives"
+        media={hero}
       >
         <SiteButton href="/quote" variant="ink">
           Request a quote

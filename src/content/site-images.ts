@@ -1,5 +1,6 @@
 import { CATALOG } from "@/content/catalog";
 import { portfolioItems } from "@/content/portfolio";
+import { services } from "@/content/services";
 import { site, socialGallery } from "@/content/site";
 
 export interface SiteImageDefinition {
@@ -56,6 +57,13 @@ export const siteImageDefinitions: SiteImageDefinition[] = [
     defaultUrl: "/images/brand/merch-notebook.jpg",
     defaultAlt: "Branded notebook",
   },
+  {
+    key: "products:hero",
+    label: "Products page hero",
+    group: "Products",
+    defaultUrl: "/images/brand/merch-box.jpg",
+    defaultAlt: "A branded corporate gift box produced by JsCreatives",
+  },
   ...CATALOG.map((product) => ({
     key: `product:${product.slug}:image`,
     label: product.name,
@@ -63,6 +71,20 @@ export const siteImageDefinitions: SiteImageDefinition[] = [
     defaultUrl: product.image,
     defaultAlt: product.name,
   })),
+  ...services.map((service) => ({
+    key: `service:${service.slug}:image`,
+    label: service.name,
+    group: "Services",
+    defaultUrl: service.image,
+    defaultAlt: service.imageAlt,
+  })),
+  {
+    key: "portfolio:hero",
+    label: "Portfolio page hero",
+    group: "Portfolio",
+    defaultUrl: "/images/brand/work-asali-botanics.jpg",
+    defaultAlt: "Label and packaging design produced for Asali Botanics",
+  },
   ...portfolioItems.map((item) => ({
     key: `portfolio:${item.id}:image`,
     label: item.title,
@@ -71,11 +93,32 @@ export const siteImageDefinitions: SiteImageDefinition[] = [
     defaultAlt: `${item.title} — ${item.client}`,
   })),
   {
-    key: "portfolio:hero",
-    label: "Portfolio page hero",
-    group: "Portfolio",
-    defaultUrl: "/images/brand/work-asali-botanics.jpg",
-    defaultAlt: "Label and packaging design produced for Asali Botanics",
+    key: "about:hero",
+    label: "About page hero",
+    group: "About",
+    defaultUrl: "/images/brand/work-mara-co.jpg",
+    defaultAlt: "Storefront branding and signage produced for Mara & Co.",
+  },
+  {
+    key: "about:why-image",
+    label: "About page feature image",
+    group: "About",
+    defaultUrl: "/images/brand/work-orbit-tech.jpg",
+    defaultAlt: "Branded event merchandise produced for Orbit Tech",
+  },
+  {
+    key: "how-it-works:hero",
+    label: "How It Works page hero",
+    group: "How It Works",
+    defaultUrl: "/images/brand/work-lumen-studio.jpg",
+    defaultAlt: "Design, print and stationery production for Lumen Studio",
+  },
+  {
+    key: "how-it-works:faq-image",
+    label: "How It Works FAQ image",
+    group: "How It Works",
+    defaultUrl: "/images/brand/merch-cards.jpg",
+    defaultAlt: "Premium business cards produced by JsCreatives",
   },
   ...socialGallery.map((item, index) => ({
     key: `gallery:${index + 1}:image`,

@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { productSchema } from '@/lib/validations'
@@ -134,6 +135,7 @@ export async function POST(request: Request) {
       details: { name: product!.name },
     })
 
+    revalidatePath('/', 'layout')
     return Response.json({ product }, { status: 201 })
   } catch (error) {
     console.error('Admin create product error:', error)

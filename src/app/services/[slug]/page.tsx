@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight, Check } from "lucide-react";
+import { SiteMedia } from "@/components/site/site-media";
 import { SiteButton } from "@/components/ui/site-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { getService, services } from "@/content/services";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+
+export const dynamic = "force-dynamic";
 
 interface ServicePageProps {
   params: Promise<{ slug: string }>;
@@ -22,6 +25,11 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
 
   if (!service) return {};
 
+  const media = resolveSiteImage(
+    await getSiteImageMap(),
+    `service:${service.slug}:image`
+  );
+
   return {
     title: service.seoTitle,
     description: service.seoDescription,
@@ -29,7 +37,13 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
     openGraph: {
       title: service.seoTitle,
       description: service.seoDescription,
-      images: [{ url: service.image, alt: service.imageAlt }],
+      images: [
+        {
+          url:
+            media.mediaKind === "IMAGE" && media.url ? media.url : service.image,
+          alt: media.altText || service.imageAlt,
+        },
+      ],
     },
   };
 }
@@ -40,7 +54,15 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
 
   if (!service) notFound();
 
-  const related = services.filter((item) => item.slug !== service.slug).slice(0, 3);
+  const images = await getSiteImageMap();
+  const media = resolveSiteImage(images, `service:${service.slug}:image`);
+  const related = services
+    .filter((item) => item.slug !== service.slug)
+    .slice(0, 3)
+    .map((item) => ({
+      ...item,
+      media: resolveSiteImage(images, `service:${item.slug}:image`),
+    }));
   const serviceIndex = services.findIndex((item) => item.slug === service.slug) + 1;
 
   const schema = {
@@ -99,13 +121,10 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           </div>
           <div className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden bg-charcoal">
-              <Image
-                src={service.image}
-                alt={service.imageAlt}
-                fill
+              <SiteMedia
+                media={media}
                 priority
                 sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover"
               />
             </div>
           </div>
@@ -187,12 +206,10 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                   className="group block border-t border-line-dark pt-4"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-charcoal">
-                    <Image
-                      src={item.image}
-                      alt={item.imageAlt}
-                      fill
+                    <SiteMedia
+                      media={item.media}
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="transition-transform duration-700 group-hover:scale-105"
                     />
                   </div>
                   <div className="mt-4 flex items-center justify-between gap-4">

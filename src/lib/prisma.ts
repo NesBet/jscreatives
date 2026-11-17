@@ -5,10 +5,19 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL!
-  const adapter = new PrismaPg({ connectionString })
+  const configuredPoolMax = Number(process.env.DATABASE_POOL_MAX ?? 3)
+  const max =
+    Number.isFinite(configuredPoolMax) && configuredPoolMax > 0
+      ? configuredPoolMax
+      : 3
+  const adapter = new PrismaPg({
+    connectionString,
+    max,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 15_000,
+  })
   return new PrismaClient({ adapter })
 }
 
 export const prisma = globalForPrisma.prisma || createPrismaClient()
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+globalForPrisma.prisma = prisma

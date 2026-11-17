@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Compass, Eye } from "lucide-react";
 import { PageHero } from "@/components/site/page-hero";
+import { SiteMedia } from "@/components/site/site-media";
 import { SiteButton } from "@/components/ui/site-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { coreValues, site, whyChoose } from "@/content/site";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -15,7 +18,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const images = await getSiteImageMap();
+  const hero = resolveSiteImage(images, "about:hero");
+  const whyImage = resolveSiteImage(images, "about:why-image");
+
   return (
     <>
       <PageHero
@@ -42,8 +49,7 @@ export default function AboutPage() {
             </p>
           </>
         }
-        image="/images/brand/work-mara-co.jpg"
-        imageAlt="Storefront branding and signage produced for Mara & Co."
+        media={hero}
       >
         <SiteButton href="/quote" variant="ink">
           Start a project
@@ -215,12 +221,9 @@ export default function AboutPage() {
         <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="lg:col-span-5">
             <div className="relative aspect-[4/5] overflow-hidden bg-charcoal">
-              <Image
-                src="/images/brand/work-orbit-tech.jpg"
-                alt="Branded event merchandise produced for Orbit Tech"
-                fill
+              <SiteMedia
+                media={whyImage}
                 sizes="(max-width: 1024px) 100vw, 42vw"
-                className="object-cover"
               />
             </div>
           </Reveal>

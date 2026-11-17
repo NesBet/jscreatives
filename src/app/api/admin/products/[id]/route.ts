@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { productSchema } from '@/lib/validations'
@@ -125,6 +126,7 @@ export async function PUT(
       details: { name: product!.name },
     })
 
+    revalidatePath('/', 'layout')
     return Response.json({ product }, { status: 200 })
   } catch (error) {
     console.error('Admin update product error:', error)
@@ -159,6 +161,7 @@ export async function DELETE(
       details: { name: existing.name },
     })
 
+    revalidatePath('/', 'layout')
     return Response.json({ message: 'Product deleted' }, { status: 200 })
   } catch (error) {
     console.error('Admin delete product error:', error)

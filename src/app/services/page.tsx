@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PageHero } from "@/components/site/page-hero";
+import { SiteMedia } from "@/components/site/site-media";
 import { SiteButton } from "@/components/ui/site-button";
 import { Reveal } from "@/components/ui/reveal";
 import { services } from "@/content/services";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Our Services",
@@ -14,7 +17,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/services" },
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const images = await getSiteImageMap();
+  const items = services.map((service) => ({
+    ...service,
+    media: resolveSiteImage(images, `service:${service.slug}:image`),
+  }));
+
   return (
     <>
       <PageHero
@@ -44,7 +53,7 @@ export default function ServicesPage() {
 
       <section className="py-8 lg:py-12">
         <div className="container-wide">
-          {services.map((service, index) => (
+          {items.map((service, index) => (
             <Reveal key={service.slug} delay={40}>
               <article className="grid gap-8 border-b border-line py-12 first:pt-4 lg:grid-cols-12 lg:gap-12 lg:py-16">
                 <div
@@ -54,12 +63,10 @@ export default function ServicesPage() {
                     href={`/services/${service.slug}`}
                     className="group relative block aspect-[4/3] overflow-hidden bg-charcoal"
                   >
-                    <Image
-                      src={service.image}
-                      alt={service.imageAlt}
-                      fill
+                    <SiteMedia
+                      media={service.media}
                       sizes="(max-width: 1024px) 100vw, 42vw"
-                      className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+                      className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                     />
                     <span className="absolute left-4 top-4 bg-paper/90 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
                       0{index + 1}

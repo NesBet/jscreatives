@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { getSiteImageMap } from '@/lib/site-images'
 import { PRODUCT_PER_PAGE } from '@/constants'
 
 export async function GET(request: Request) {
@@ -35,7 +36,8 @@ export async function GET(request: Request) {
 
     const skip = (page - 1) * perPage
 
-    const [products, total] = await Promise.all([
+    const [siteImages, products, total] = await Promise.all([
+      getSiteImageMap(),
       prisma.product.findMany({
         where,
         orderBy,
@@ -49,9 +51,32 @@ export async function GET(request: Request) {
       prisma.product.count({ where }),
     ])
 
+    const productsWithSiteMedia = products.map((product) => {
+      const override = siteImages.get(`product:${product.slug}:image`)
+      if (
+        !override?.isOverride ||
+        override.mediaKind !== 'IMAGE' ||
+        !override.url
+      ) {
+        return product
+      }
+      return {
+        ...product,
+        images: [
+          {
+            mediaKind: override.mediaKind,
+            url: override.url,
+            embedUrl: override.embedUrl,
+            altText: override.altText,
+          },
+          ...product.images,
+        ],
+      }
+    })
+
     return Response.json(
       {
-        products,
+        products: productsWithSiteMedia,
         pagination: {
           page,
           perPage,

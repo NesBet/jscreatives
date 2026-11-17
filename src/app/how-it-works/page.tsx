@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check, Clock, FileCheck2, MessageSquare, Palette } from "lucide-react";
 import { PageHero } from "@/components/site/page-hero";
+import { SiteMedia } from "@/components/site/site-media";
 import { SiteButton } from "@/components/ui/site-button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/ui/reveal";
 import { detailedProcess } from "@/content/site";
+import { getSiteImageMap, resolveSiteImage } from "@/lib/site-images";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "How It Works",
@@ -61,7 +64,11 @@ const faqs = [
   },
 ];
 
-export default function HowItWorksPage() {
+export default async function HowItWorksPage() {
+  const images = await getSiteImageMap();
+  const hero = resolveSiteImage(images, "how-it-works:hero");
+  const faqImage = resolveSiteImage(images, "how-it-works:faq-image");
+
   return (
     <>
       <PageHero
@@ -79,8 +86,7 @@ export default function HowItWorksPage() {
             happening, what has been approved and when your order will be ready.
           </p>
         }
-        image="/images/brand/work-lumen-studio.jpg"
-        imageAlt="Design, print and stationery production for Lumen Studio"
+        media={hero}
       >
         <SiteButton href="/quote" variant="ink">
           Start your quote
@@ -194,12 +200,9 @@ export default function HowItWorksPage() {
               <span className="text-gold-deep">answered.</span>
             </h2>
             <div className="mt-8 relative aspect-[4/3] overflow-hidden bg-charcoal">
-              <Image
-                src="/images/brand/merch-cards.jpg"
-                alt="Premium business cards produced by JsCreatives"
-                fill
+              <SiteMedia
+                media={faqImage}
                 sizes="(max-width: 1024px) 100vw, 33vw"
-                className="object-cover"
               />
             </div>
           </Reveal>

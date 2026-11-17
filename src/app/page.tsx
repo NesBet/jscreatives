@@ -118,6 +118,10 @@ export default async function HomePage() {
     const media = resolveSiteImage(images, `gallery:${index + 1}:image`);
     return { ...item, media, altText: media.altText };
   });
+  const serviceItems = services.map((service) => ({
+    ...service,
+    media: resolveSiteImage(images, `service:${service.slug}:image`),
+  }));
   const stories = await getPublishedCaseStudies({ limit: 3, featuredOnly: true });
 
   return (
@@ -305,19 +309,17 @@ export default async function HomePage() {
           </Reveal>
 
           <div className="mt-14 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((service, index) => (
+            {serviceItems.map((service, index) => (
               <Reveal key={service.slug} delay={(index % 3) * 80}>
                 <Link
                   href={`/services/${service.slug}`}
                   className="group block border-t border-line-dark pt-4"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-charcoal">
-                    <Image
-                      src={service.image}
-                      alt={service.imageAlt}
-                      fill
+                    <SiteMedia
+                      media={service.media}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
+                      className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.045]"
                     />
                     <span className="absolute left-3 top-3 bg-ink/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-paper backdrop-blur-sm">
                       0{index + 1}
