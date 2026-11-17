@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { LoaderCircle, LogOut, TriangleAlert, X } from "lucide-react";
 import { useAuth } from "@/components/layout/auth-provider";
@@ -107,132 +108,135 @@ export function LogoutButton({ tone = "public" }: LogoutButtonProps) {
         <span className={isAdmin ? "hidden sm:inline" : undefined}>Log out</span>
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-fade-in"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) close();
-          }}
-        >
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            ref={dialogRef}
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="logout-title"
-            aria-describedby="logout-description"
-            className={
-              isAdmin
-                ? "relative w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 text-white shadow-2xl animate-scale-in sm:p-7"
-                : "relative w-full max-w-md rounded-2xl border border-line bg-paper p-6 text-ink shadow-2xl animate-scale-in sm:p-7"
-            }
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-fade-in"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) close();
+            }}
           >
-            <button
-              type="button"
-              onClick={close}
-              disabled={submitting}
+            <div
+              ref={dialogRef}
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="logout-title"
+              aria-describedby="logout-description"
               className={
                 isAdmin
-                  ? "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-50"
-                  : "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-paper-deep hover:text-ink disabled:opacity-50"
-              }
-              aria-label="Close logout confirmation"
-            >
-              <X className="h-4 w-4" strokeWidth={1.8} />
-            </button>
-
-            <span
-              className={
-                isAdmin
-                  ? "inline-flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-gold-soft"
-                  : "inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-600/10 text-red-600"
+                  ? "relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-slate-700 bg-slate-900 p-6 text-white shadow-2xl animate-scale-in sm:p-7"
+                  : "relative max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-line bg-paper p-6 text-ink shadow-2xl animate-scale-in sm:p-7"
               }
             >
-              <TriangleAlert className="h-6 w-6" strokeWidth={1.7} />
-            </span>
-
-            <h2
-              id="logout-title"
-              className={`mt-5 font-display text-2xl font-semibold tracking-[-0.03em] ${
-                isAdmin ? "text-white" : "text-ink"
-              }`}
-            >
-              {isAdmin ? "Log out of admin?" : "Log out of your account?"}
-            </h2>
-            <p
-              id="logout-description"
-              className={`mt-3 text-sm leading-6 ${isAdmin ? "text-slate-400" : "text-stone"}`}
-            >
-              {user?.email ? (
-                <>
-                  You are signed in as{" "}
-                  <span className={`font-medium ${isAdmin ? "text-white" : "text-ink"}`}>
-                    {user.email}
-                  </span>
-                  .{" "}
-                  {isAdmin
-                    ? "You will need to sign in again to manage the site."
-                    : "You will need to sign in again to view your orders and account details."}
-                </>
-              ) : isAdmin ? (
-                "You will need to sign in again to manage the site."
-              ) : (
-                "You will need to sign in again to view your orders and account details."
-              )}
-            </p>
-
-            {error && (
-              <p
-                className={
-                  isAdmin
-                    ? "mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
-                    : "mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
-                }
-                role="alert"
-              >
-                {error}
-              </p>
-            )}
-
-            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
-                ref={cancelRef}
                 type="button"
                 onClick={close}
                 disabled={submitting}
                 className={
                   isAdmin
-                    ? "inline-flex h-11 items-center justify-center rounded-lg border border-slate-600 px-5 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-800 disabled:opacity-50"
-                    : "inline-flex h-11 items-center justify-center rounded-lg border border-line px-5 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-paper-deep disabled:opacity-50"
+                    ? "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-50"
+                    : "absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-paper-deep hover:text-ink disabled:opacity-50"
                 }
+                aria-label="Close logout confirmation"
               >
-                Stay signed in
+                <X className="h-4 w-4" strokeWidth={1.8} />
               </button>
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={submitting}
+
+              <span
                 className={
                   isAdmin
-                    ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-ink transition-colors hover:bg-gold-soft disabled:cursor-not-allowed disabled:opacity-60"
-                    : "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    ? "inline-flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-gold-soft"
+                    : "inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-600/10 text-red-600"
                 }
               >
-                {submitting ? (
+                <TriangleAlert className="h-6 w-6" strokeWidth={1.7} />
+              </span>
+
+              <h2
+                id="logout-title"
+                className={`mt-5 font-display text-2xl font-semibold tracking-[-0.03em] ${
+                  isAdmin ? "text-white" : "text-ink"
+                }`}
+              >
+                {isAdmin ? "Log out of admin?" : "Log out of your account?"}
+              </h2>
+              <p
+                id="logout-description"
+                className={`mt-3 text-sm leading-6 ${isAdmin ? "text-slate-400" : "text-stone"}`}
+              >
+                {user?.name ? (
                   <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" strokeWidth={1.8} />
-                    Logging out...
+                    You are signed in as{" "}
+                    <span className={`font-medium ${isAdmin ? "text-white" : "text-ink"}`}>
+                      {user.name}
+                    </span>
+                    .{" "}
+                    {isAdmin
+                      ? "You will need to sign in again to manage the site."
+                      : "You will need to sign in again to view your orders and account details."}
                   </>
+                ) : isAdmin ? (
+                  "You will need to sign in again to manage the site."
                 ) : (
-                  <>
-                    <LogOut className="h-4 w-4" strokeWidth={1.8} />
-                    Yes, log out
-                  </>
+                  "You will need to sign in again to view your orders and account details."
                 )}
-              </button>
+              </p>
+
+              {error && (
+                <p
+                  className={
+                    isAdmin
+                      ? "mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+                      : "mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                  }
+                  role="alert"
+                >
+                  {error}
+                </p>
+              )}
+
+              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  ref={cancelRef}
+                  type="button"
+                  onClick={close}
+                  disabled={submitting}
+                  className={
+                    isAdmin
+                      ? "inline-flex h-11 items-center justify-center rounded-lg border border-slate-600 px-5 text-sm font-semibold text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-800 disabled:opacity-50"
+                      : "inline-flex h-11 items-center justify-center rounded-lg border border-line px-5 text-sm font-semibold text-ink transition-colors hover:border-ink hover:bg-paper-deep disabled:opacity-50"
+                  }
+                >
+                  Stay signed in
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={submitting}
+                  className={
+                    isAdmin
+                      ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-gold px-5 text-sm font-semibold text-ink transition-colors hover:bg-gold-soft disabled:cursor-not-allowed disabled:opacity-60"
+                      : "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  }
+                >
+                  {submitting ? (
+                    <>
+                      <LoaderCircle className="h-4 w-4 animate-spin" strokeWidth={1.8} />
+                      Logging out...
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="h-4 w-4" strokeWidth={1.8} />
+                      Yes, log out
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
