@@ -215,7 +215,7 @@ export default function AdminOrdersPage() {
                                   <div key={item.id} className="flex items-center gap-3 rounded-lg bg-slate-800/50 p-2">
                                     {item.productImage && (
                                       // eslint-disable-next-line @next/next/no-img-element
-                                      <img src={item.productImage} alt={item.productName} className="h-12 w-12 rounded object-cover" />
+                                      <img src={item.productImage} alt={item.productName} className="h-12 w-12 rounded object-cover" loading="lazy" decoding="async" />
                                     )}
                                     <div className="text-sm">
                                       <p className="text-white">

@@ -6,7 +6,6 @@ interface SiteMediaProps {
   media: MediaValue;
   sizes: string;
   className?: string;
-  priority?: boolean;
   videoControls?: boolean;
   interactive?: boolean;
 }
@@ -30,7 +29,6 @@ export function SiteMedia({
   media,
   sizes,
   className,
-  priority = false,
   videoControls = true,
   interactive = true,
 }: SiteMediaProps) {
@@ -44,7 +42,7 @@ export function SiteMedia({
         title={label}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
-        loading={priority ? "eager" : "lazy"}
+        loading="lazy"
         referrerPolicy="strict-origin-when-cross-origin"
         className={cn("h-full w-full border-0", interactionClass, className)}
       />
@@ -74,7 +72,8 @@ export function SiteMedia({
         alt={media.altText || ""}
         fill
         sizes={sizes}
-        priority={priority}
+        loading="lazy"
+        decoding="async"
         unoptimized={!canOptimize(media.url)}
         className={cn("object-cover", className)}
       />

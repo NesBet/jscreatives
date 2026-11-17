@@ -209,7 +209,6 @@ export default async function HomePage() {
               <div className="group relative aspect-[16/10] overflow-hidden bg-charcoal">
                 <SiteMedia
                   media={heroCollage}
-                  priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
                   className="transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.02]"
                 />

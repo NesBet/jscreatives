@@ -59,14 +59,14 @@ export function PageHero({
                   <SiteMedia
                     media={media}
                     sizes="(max-width: 1024px) 100vw, 40vw"
-                    priority
                   />
                 ) : image ? (
                   <Image
                     src={image}
                     alt={imageAlt}
                     fill
-                    priority
+                    loading="lazy"
+                    decoding="async"
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className="object-cover"
                   />

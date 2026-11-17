@@ -162,7 +162,7 @@ function OrderConfirmationPage() {
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-slate-900">
                 {item.productImage && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.productImage} alt={item.productName} className="h-full w-full object-cover" />
+                  <img src={item.productImage} alt={item.productName} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                 )}
               </div>
               <div className="flex-1">

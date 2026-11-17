@@ -64,6 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 alt={image?.altText || `${product.name} branded merchandise`}
                 fill
                 loading="lazy"
+                decoding="async"
                 onError={() => setImgError(true)}
                 className="object-cover transition-transform duration-700 ease-[var(--ease-smooth)] group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

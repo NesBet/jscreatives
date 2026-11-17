@@ -55,6 +55,8 @@ function CartItemBase({ item, onUpdateQuantity, onRemove, updating }: CartItemPr
           src={imgError ? '/jscreatives.webp' : (image?.url || '/jscreatives.webp')}
           alt={image?.altText || item.variant.product.name}
           fill
+          loading="lazy"
+          decoding="async"
           onError={() => setImgError(true)}
           className="object-cover"
           sizes="96px"

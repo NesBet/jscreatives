@@ -10,10 +10,9 @@ import { cn } from "@/lib/utils";
 interface ProductCardProps {
   product: CatalogProduct & { media?: MediaValue };
   className?: string;
-  priority?: boolean;
 }
 
-export function ProductCard({ product, className, priority = false }: ProductCardProps) {
+export function ProductCard({ product, className }: ProductCardProps) {
   const price =
     product.basePrice > 0
       ? `From KES ${new Intl.NumberFormat("en-KE").format(product.basePrice)}`
@@ -30,7 +29,6 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           <SiteMedia
             media={{ ...product.media, altText: product.name }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            priority={priority}
             videoControls={false}
             interactive={false}
             className="transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
@@ -40,7 +38,8 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             src={product.image}
             alt={product.name}
             fill
-            priority={priority}
+            loading="lazy"
+            decoding="async"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />

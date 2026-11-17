@@ -49,6 +49,8 @@ export function BrandingJourneys({ stories, compact = false }: BrandingJourneysP
                     src={story.coverUrl}
                     alt={story.coverAlt || story.title}
                     fill
+                    loading="lazy"
+                    decoding="async"
                     sizes={compact ? "(max-width: 768px) 100vw, 33vw" : "(max-width: 768px) 100vw, 50vw"}
                     className="object-cover transition-transform duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                   />

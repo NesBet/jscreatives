@@ -95,7 +95,6 @@ export function ImageCarousel({ items, className }: ImageCarouselProps) {
         <SiteMedia
           media={active}
           sizes="(max-width: 1024px) 100vw, 50vw"
-          priority
           videoControls
         />
 

@@ -357,6 +357,7 @@ export default function AdminMediaPage() {
                       alt={asset.altText || ""}
                       className="h-full w-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                   )}
                   <span className="absolute left-2 top-2 rounded bg-slate-950/80 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-200 backdrop-blur-sm">

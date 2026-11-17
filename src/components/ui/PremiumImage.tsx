@@ -8,12 +8,11 @@ interface PremiumImageProps {
   src: string;
   alt: string;
   fill?: boolean;
-  priority?: boolean;
   className?: string;
   revealDirection?: "up" | "down" | "left" | "right" | "scale";
 }
 
-export const PremiumImage = ({ src, alt, fill = false, priority = false, className = "", revealDirection = "scale" }: PremiumImageProps) => {
+export const PremiumImage = ({ src, alt, fill = false, className = "", revealDirection = "scale" }: PremiumImageProps) => {
   const imgRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [inView, setInView] = useState(false);
@@ -80,7 +79,8 @@ export const PremiumImage = ({ src, alt, fill = false, priority = false, classNa
         src={src}
         alt={alt}
         fill={fill}
-        priority={priority}
+        loading="lazy"
+        decoding="async"
         className={`transition-opacity duration-500 ease-out ${loaded ? "opacity-100" : "opacity-0"} ${inView ? "" : "opacity-0"}`}
         onLoad={() => setLoaded(true)}
         sizes={fill ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" : undefined}

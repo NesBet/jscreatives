@@ -123,8 +123,8 @@ export function CatalogBrowser({ products }: CatalogBrowserProps) {
           </div>
         ) : (
           <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((product, index) => (
-              <ProductCard key={product.slug} product={product} priority={index < 4} />
+            {filtered.map((product) => (
+              <ProductCard key={product.slug} product={product} />
             ))}
           </div>
         )}

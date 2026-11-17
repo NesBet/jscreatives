@@ -258,6 +258,7 @@ export default function AdminCaseStudiesPage() {
                     alt={story.coverAlt || story.title}
                     className="h-full w-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute left-2 top-2 flex gap-1.5">
                     <span
@@ -432,6 +433,8 @@ export default function AdminCaseStudiesPage() {
                         src={form.coverUrl}
                         alt=""
                         className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <span className="flex h-full items-center justify-center text-[10px] text-slate-600">
@@ -494,6 +497,8 @@ export default function AdminCaseStudiesPage() {
                             src={image.url}
                             alt=""
                             className="h-full w-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <span className="flex h-full items-center justify-center text-[10px] text-slate-600">

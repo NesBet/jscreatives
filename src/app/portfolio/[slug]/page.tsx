@@ -84,7 +84,8 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                   src={story.coverUrl}
                   alt={story.coverAlt || story.title}
                   fill
-                  priority
+                  loading="lazy"
+                  decoding="async"
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover"
                 />
@@ -166,6 +167,8 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                                 src={image.url}
                                 alt={image.altText || image.caption || story.title}
                                 fill
+                                loading="lazy"
+                                decoding="async"
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 className="object-cover"
                               />
@@ -212,6 +215,8 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
                       src={item.coverUrl}
                       alt={item.coverAlt || item.title}
                       fill
+                      loading="lazy"
+                      decoding="async"
                       sizes="120px"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />

@@ -123,7 +123,6 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
             <div className="relative aspect-[4/5] overflow-hidden bg-charcoal">
               <SiteMedia
                 media={media}
-                priority
                 sizes="(max-width: 1024px) 100vw, 40vw"
               />
             </div>

@@ -127,6 +127,8 @@ export function MediaSourceEditor({
           src={value.url}
           alt={value.altText || "Media preview"}
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
       )
     ) : (
