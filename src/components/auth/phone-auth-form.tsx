@@ -68,7 +68,7 @@ function CountryPhoneInput({
           value={phone}
           disabled={disabled}
           onChange={(e) => onPhoneChange(e.target.value.replace(/[^0-9]/g, ''))}
-          placeholder="780237794"
+          placeholder="712345678"
           className="h-12 min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-white outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30 disabled:opacity-50"
           autoComplete="tel-national"
         />
