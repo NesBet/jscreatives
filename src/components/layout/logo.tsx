@@ -3,15 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSiteLogo } from "@/components/layout/site-logo-provider";
+import { brandLogo } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
   invert?: boolean;
   className?: string;
+  source?: "site" | "brand";
 }
 
-export function Logo({ invert = false, className }: LogoProps) {
-  const logo = useSiteLogo();
+export function Logo({ invert = false, className, source = "site" }: LogoProps) {
+  const siteLogo = useSiteLogo();
+  const logo = source === "brand" ? brandLogo : siteLogo;
 
   return (
     <Link

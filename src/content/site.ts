@@ -1,7 +1,12 @@
+export const brandLogo = {
+  url: "/jscreatives.webp",
+  alt: "JsCreatives logo",
+} as const;
+
 export const site = {
   name: "JsCreatives",
   shortName: "JSCREATIVES",
-  logo: "/jscreatives.webp",
+  logo: brandLogo.url,
   legalName: "JsCreatives",
   tagline: "Where Brands Stand Out.",
   positioning: "Your Trusted Partner in Printing & Branding.",

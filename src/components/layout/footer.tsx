@@ -43,7 +43,7 @@ export function Footer() {
 
         <div className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_0.9fr_1.05fr] lg:py-16">
           <div>
-            <Logo invert />
+            <Logo invert source="brand" />
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-paper/55">
               {site.description}
             </p>

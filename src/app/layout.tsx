@@ -7,7 +7,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { SiteChrome } from "@/components/layout/site-chrome";
 import { SiteLogoProvider } from "@/components/layout/site-logo-provider";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
-import { site } from "@/content/site";
+import { brandLogo, site } from "@/content/site";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -79,8 +79,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/jscreatives.jpg",
-    apple: "/jscreatives.jpg",
+    icon: [{ url: brandLogo.url, type: "image/webp" }],
+    apple: [{ url: brandLogo.url, type: "image/webp" }],
   },
 };
 

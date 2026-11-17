@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { site } from "@/content/site";
+import { brandLogo } from "@/content/site";
 
 interface SiteLogoValue {
   url: string;
@@ -15,8 +15,8 @@ interface SiteLogoValue {
 }
 
 const defaultLogo: SiteLogoValue = {
-  url: site.logo,
-  alt: "JsCreatives logo",
+  url: brandLogo.url,
+  alt: brandLogo.alt,
 };
 
 const SiteLogoContext = createContext<SiteLogoValue>(defaultLogo);
